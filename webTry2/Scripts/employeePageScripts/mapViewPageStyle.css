@@ -1,0 +1,16 @@
+﻿#googleMap {
+    width: 70%;
+    height: 450px;
+    background-color: grey;
+    margin-bottom: 10px;
+}
+
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+    .flex-container > div {
+        width: 40%;
+        margin: 5px;
+        font-size: 15px;
+    }

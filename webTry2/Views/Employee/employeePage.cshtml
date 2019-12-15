@@ -1,0 +1,185 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+    <meta name="viewport" content="width=device-width" />
+    <title>employeePage</title>
+    <script src="~/Scripts/angular.js"></script>
+    <!-- employee page angularJS -->
+    <script src="~/Scripts/employeePageScripts/employee_app.js"></script>
+    <!-- employee encryptor table style -->
+    <link href="~/Scripts/employeePageScripts/employeeTableStyle.css" rel="stylesheet" />
+    <!-- employee encryptor map view style -->
+    <link href="~/Scripts/employeePageScripts/mapViewPageStyle.css" rel="stylesheet" />
+    <!--    google maps      -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCu17rCny75w7pwUdE86_ar2ditlZA-Ous&">
+    </script>
+    <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
+    
+    <!-- Global -->
+    <script src="~/Scripts/general functions/Global functions.js"></script>
+</head>
+<body ng-app="employeeAng" ng-controller="employeePageContoller" ng-init="onLoad()">
+    <!-- HOME PAGE -->
+    <!-- nav bar same as on home page -->
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <span class="navbar-brand" style="color:antiquewhite"> Hello</span>
+            </div>
+            <ul class="nav navbar-nav">
+                <li><a id="encryptorManagmentLink" onclick="$('#encryptorManagmentPage').show(); $('#encryptorMappingPage').hide()"> Encryptor managment </a></li>
+                <li><a id="encryptorMappingPageLink" onclick="$('#encryptorMappingPage').show(); $('#encryptorManagmentPage').hide()">Encryptor mapping</a></li>
+            </ul>
+            <button type="button" style="float:right" class="btn btn-primary navbar-btn" ng-click="logout()">Logout</button>
+        </div>
+    </nav>
+    
+    <div class="container" id="encryptorManagmentPage">
+        <div class="table-wrapper" style="margin-top:40px">
+            <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h2>Manage my<b> Encryptors</b></h2>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th><input type="text" ng-model="searchtxt.serialNumber" class="form-control" placeholder="Serial number"></th>
+                        <th><input type="text" ng-model="searchtxt.timestampAsString" class="form-control" placeholder="Time Stamp"></th>
+                        <th><input type="text" ng-model="searchtxt.deviceLocation.facility" class="form-control" placeholder="Facility"></th>
+                        <th><input type="text" ng-model="searchtxt.deviceLocation.building" class="form-control" placeholder="Building"></th>
+                        <th><input type="text" ng-model="searchtxt.status" class="form-control" placeholder="Status"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="record in userEncryptors | filter : searchtxt">
+                        <td>{{record.serialNumber}}</td>
+                        <td>{{record.timestampAsString}}</td>
+                        <td>{{record.deviceLocation.facility}}</td>
+                        <td>{{record.deviceLocation.building}}</td>
+                        <td>{{record.status}}</td>
+                        <td>
+                            <a href="#editEmployeeModal" class="visibility" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="View encryptor details" ng-click="getRowData($index)">visibility</i></a>
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+    <!-- View encryptor data Modal HTML -->
+    <div id="editEmployeeModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form>
+                    <div class="modal-header">
+                        <h4 class="modal-title">Encryptor data</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Serial number</label>
+                            <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.serialNumber">
+                        </div>
+                        <div class="form-group">
+                            <label>Time-stamp</label>
+                            <input type="datetime" class="form-control" readonly ng-model="tempDataForEditWindow.timestampAsString">
+                        </div>
+                        <div class="form-group">
+                            <label>ownerID</label>
+                            <input type="text" class="form-control" readonly  ng-model="tempDataForEditWindow.ownerID">
+                        </div>
+                        <div class="form-group">
+                            <label>status</label>
+                            <input type="text" class="form-control" readonly  ng-model="tempDataForEditWindow.status"> 
+                        </div>
+                        <div class="form-group">
+                            <label>facility</label>
+                            <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.deviceLocation.facility" />
+                        </div>
+                        <div class="form-group">
+                            <label>building</label>
+                            <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.deviceLocation.building" />
+                        </div>
+                        <div class="form-group">
+                            <label>floor</label>
+                            <input type="number" class="form-control" readonly ng-model="tempDataForEditWindow.deviceLocation.floor" />
+                        </div>
+                        <div class="form-group">
+                            <label>room</label>
+                            <input type="number" class="form-control" readonly ng-model="tempDataForEditWindow.deviceLocation.room" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MAP VIEW PAGE-->
+    <div id="encryptorMappingPage" style="display:none; margin-top:20px">
+
+        <div class="container">
+
+            <h2>View encryptors on map</h2>
+            <!--Section description-->
+            <p style="font-size:medium">
+                here you can see your encryptors on an interactive map.
+            </p>
+
+            <div class="row">
+                <!-- <div class="col-lg-5">    -->
+                <div>
+                    <div>
+                        <!--Header-->
+                        <div class="panel-heading">
+                            <h3>search your encryptor here</h3>
+                        </div>
+                        <!-- search regular without choosing -->
+                        <div class="flex-container">
+                            <input id="searchInput" type="text" class="form-control" placeholder="Search" style="max-width:50%">
+                            <button type="submit" class="btn btn-default" ng-click="searchResults()">Submit</button>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <!-- <div class="col-lg-7">    -->
+                <!--Google map-->
+                <div id="googleMap"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UPDATE REQUEST PAGE-->
+    <div class="container">
+
+    </div>
+
+</body>
+</html>
+
+
+
+
