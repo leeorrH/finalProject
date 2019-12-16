@@ -222,45 +222,18 @@ table.table .avatar {
         box-shadow: none;
         background: #ddd;
     }
-/* Modal styles */
-.modal .modal-dialog {
-    max-width: 400px;
+
+
+/*   edit modal style sheet   */
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
 }
 
-.modal .modal-header, .modal .modal-body, .modal .modal-footer {
-    padding: 20px 30px;
+.flex-container > div {
+        width: 30%;
+        margin: 10px;
+        line-height: normal;
+        font-size: 15px;
 }
-
-.modal .modal-content {
-    border-radius: 3px;
-}
-
-.modal .modal-footer {
-    background: #ecf0f1;
-    border-radius: 0 0 3px 3px;
-}
-
-.modal .modal-title {
-    display: inline-block;
-}
-
-.modal .form-control {
-    border-radius: 2px;
-    box-shadow: none;
-    border-color: #dddddd;
-}
-
-.modal textarea.form-control {
-    resize: vertical;
-}
-
-.modal .btn {
-    border-radius: 2px;
-    min-width: 100px;
-}
-
-.modal form label {
-    font-weight: normal;
-}
-
 

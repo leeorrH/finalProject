@@ -126,9 +126,9 @@ app.controller("employeePageContoller", function ($scope, $http, $location) {
 
 });
 
-
+/*
 app.factory('dataSharing', function () {
     var data = {
         encryptorsArray: {}
     };
-})
+})*/
