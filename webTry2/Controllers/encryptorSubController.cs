@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 using webTry2.Models;
 using System.Globalization;
-using System.Web.Mvc;
 
 namespace webTry2.Controllers
 {
