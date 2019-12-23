@@ -155,6 +155,18 @@
                     <div class="modal-body">
                         <div class="form-group flex-container">
                             <div>
+                                <label>report about: </label>
+                                <div>
+                                    <select class="selectpicker" data-live-search="true" >
+                                        <option>monthly report</option>
+                                        <option>changing encryptor location</option>
+                                        <option>changing encryptor status</option>
+                                        <option>deliver to customer</option>
+                                        <option>deliver to employee</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
                                 <label> Encryptor Serial number</label>
                                 <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.serialNumber">
                             </div>
@@ -162,7 +174,6 @@
                                 <label>Time-stamp</label>
                                 <input type="datetime" class="form-control" readonly ng-model="tempDataForEditWindow.timestampAsString">
                             </div>
-                            <div></div>
                             <div>
                                 <label>ownerID</label>
                                 <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.ownerID">
