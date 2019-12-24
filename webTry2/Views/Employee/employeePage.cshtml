@@ -157,7 +157,7 @@
                             <div>
                                 <label>report about: </label>
                                 <div>
-                                    <select class="selectpicker" data-live-search="true" >
+                                    <select class="selectpicker" data-live-search="true" ng-model="SelectesReasonReport" ng-change="ReportAbout()">
                                         <option>monthly report</option>
                                         <option>changing encryptor location</option>
                                         <option>changing encryptor status</option>
@@ -193,6 +193,7 @@
                                     </select>
                                 </div>
                             </div>
+                        <div ng-hide="deliverToCustomerDetails" class="ng-hide">
                             <div>
                                 <label>Enc. site: </label>
                                 <div>
@@ -222,6 +223,7 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
                         <div class="container">
                             <div style="width:70%; height: 100px; margin:10px">
                                 <label>Edit reasons</label>

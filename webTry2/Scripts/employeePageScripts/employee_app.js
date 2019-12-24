@@ -5,7 +5,7 @@ app.controller("employeePageContoller", function ($scope, $http, $location) {
     var postData = $location.$$absUrl.split("?");
     $scope.userName = postData[1].split("=");
     $scope.userName = $scope.userName[1];
-
+    $scope.deliverToCustomerDetails = true;
     //    for EDIT and Display
     /* introduction: userEncryptors including encryptors locations- lat and long!
      * markers init function: initMarkers without setting them on map
@@ -77,6 +77,25 @@ app.controller("employeePageContoller", function ($scope, $http, $location) {
 
     $scope.logout = function () {
        window.location.href = "/";
+    };
+
+    $scope.ReportAbout=function(reportReason){
+        var reason = $scope.SelectesReasonReport;
+        switch (reason) {
+            case 'changing encryptor location':
+                $scope.deliverToCustomerDetails = false;
+                break;
+            case 'changing encryptor status':
+                $scope.deliverToCustomerDetails = true;
+                break;
+            case 'deliver to customer':
+                $scope.deliverToCustomerDetails = true;
+                break;
+            case 'deliver to employee':
+                $scope.deliverToCustomerDetails = false;
+                break;
+                
+        }
     };
 
     /*      map view page , second page for employee        */
