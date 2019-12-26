@@ -5,7 +5,14 @@ app.controller("employeePageContoller", function ($scope, $http, $location) {
     var postData = $location.$$absUrl.split("?");
     $scope.userName = postData[1].split("=");
     $scope.userName = $scope.userName[1];
-    $scope.deliverToCustomerDetails = true;
+
+    //for visibility component in employee report
+    $scope.deliverToEmpDetails = true;
+    $scope.attachReference = true;
+    $scope.locationDetails = true;
+    $scope.EncChangeStatus = true;
+    $scope.approveInUse = true;
+    $scope.ReasonToUpdate = true;
     //    for EDIT and Display
     /* introduction: userEncryptors including encryptors locations- lat and long!
      * markers init function: initMarkers without setting them on map
@@ -82,17 +89,37 @@ app.controller("employeePageContoller", function ($scope, $http, $location) {
     $scope.ReportAbout=function(reportReason){
         var reason = $scope.SelectesReasonReport;
         switch (reason) {
+            case 'monthly report':
+                $scope.approveInUse = false;
+                $scope.deliverToEmpDetails = true;
+                $scope.attachReference = true;
+                $scope.locationDetails = true;
+                $scope.EncChangeStatus = true;
+                $scope.ReasonToUpdate = true;
+                break;
             case 'changing encryptor location':
-                $scope.deliverToCustomerDetails = false;
+                $scope.approveInUse = true;
+                $scope.locationDetails = false;
+                $scope.deliverToEmpDetails = true;
+                $scope.attachReference = true;
+                $scope.EncChangeStatus = true;
+                $scope.ReasonToUpdate = false;
                 break;
             case 'changing encryptor status':
-                $scope.deliverToCustomerDetails = true;
-                break;
-            case 'deliver to customer':
-                $scope.deliverToCustomerDetails = true;
+                $scope.approveInUse = true;
+                $scope.deliverToEmpDetails = true;
+                $scope.attachReference = false;
+                $scope.locationDetails = true;
+                $scope.EncChangeStatus = false;
+                $scope.ReasonToUpdate = false;
                 break;
             case 'deliver to employee':
-                $scope.deliverToCustomerDetails = false;
+                $scope.approveInUse = true;
+                $scope.locationDetails = false;
+                $scope.deliverToEmpDetails = false;
+                $scope.attachReference = true;
+                $scope.EncChangeStatus = true;
+                $scope.ReasonToUpdate = false;
                 break;
                 
         }

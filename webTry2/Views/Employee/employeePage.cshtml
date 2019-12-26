@@ -85,7 +85,7 @@
                         <td>{{record.status}}</td>
                         <td>
                             <a href="#viewEncryptorDataModal"  data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="View encryptor details" ng-click="getRowData($index)">visibility</i></a>
-                            <a href="#editEncryptorData" class="edit" data-toggle="modal"><i data-toggle="tooltip" title="Edit encryptor details" class="material-icons">edit</i></a>
+                            <a href="#editEncryptorData" class="edit" data-toggle="modal"><i data-toggle="tooltip" title="Edit encryptor details" class="material-icons" ng-click="getRowData($index)">edit</i></a>
                         </td>
                     </tr>
                 </tbody>
@@ -154,76 +154,110 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group flex-container">
-                            <div>
+                            <div class="form-group">
                                 <label>report about: </label>
                                 <div>
                                     <select class="selectpicker" data-live-search="true" ng-model="SelectesReasonReport" ng-change="ReportAbout()">
                                         <option>monthly report</option>
-                                        <option>changing encryptor location</option>
+                                        <option selected>changing encryptor location</option>
                                         <option>changing encryptor status</option>
-                                        <option>deliver to customer</option>
                                         <option>deliver to employee</option>
                                     </select>
                                 </div>
                             </div>
                             <div>
-                                <label> Encryptor Serial number</label>
-                                <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.serialNumber">
-                            </div>
-                            <div>
-                                <label>Time-stamp</label>
-                                <input type="datetime" class="form-control" readonly ng-model="tempDataForEditWindow.timestampAsString">
-                            </div>
-                            <div>
-                                <label>ownerID</label>
-                                <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.ownerID">
-                            </div>
-                            <div>
-                                <label>Enc. deliver to: </label>
-                                <select class="selectpicker" data-live-search="true"></select>
-                            </div>
-                            <div>
-                                <label>Enc. status: </label>
-                                <div>
-                                    <select class="selectpicker" data-live-search="true">
-                                        <option>in use</option>
-                                        <option>destroyed</option>
-                                        <option>lost</option>
-                                        <option>deliverd </option>
-                                    </select>
+                                <!-- col 2  -->
+                                <div ng-hide="EncChangeStatus" class="ng-hide">
+                                    <div class="form-group">
+                                        <label>Enc. status: </label>
+                                        <div>
+                                            <select class="selectpicker" data-live-search="true">
+                                                <option>destroyed</option>
+                                                <option>lost</option>
+                                                <option>deliverd </option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        <div ng-hide="deliverToCustomerDetails" class="ng-hide">
-                            <div>
-                                <label>Enc. site: </label>
-                                <div>
-                                    <select class="selectpicker" data-live-search="true">
-                                        <option data-tokens="leshem">Leshem</option>
-                                        <option data-tokens="david">Mahon David</option>
-                                        <option data-tokens="beer sheva">Be'er Sheva</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div>
-                                <label>Enc. building: </label>
-                                <div>
+                                <div ng-hide="deliverToEmpDetails" class="ng-hide">
+                                    <label>Enc. deliver to: </label>
                                     <select class="selectpicker" data-live-search="true"></select>
                                 </div>
-                            </div>
-                            <div>
-                                <label>Enc. floor</label>
-                                <div>
-                                    <select class="selectpicker" data-live-search="true"></select>
+                                <div ng-hide="locationDetails" class="ng-hide">
+                                    <div class="form-group">
+                                        <label>Enc. site: </label>
+                                        <div>
+                                            <select class="selectpicker" data-live-search="true">
+                                                <option data-tokens="leshem">Leshem</option>
+                                                <option data-tokens="david">David</option>
+                                                <option data-tokens="beer sheva">Be'er Sheva</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label>Enc. building: </label>
+                                        <div>
+                                            <select class="selectpicker" data-live-search="true"></select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label>Enc. floor</label>
+                                        <div>
+                                            <select class="selectpicker" data-live-search="true"></select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label>Enc. room</label>
+                                        <div>
+                                            <select class="selectpicker" data-live-search="true"></select>
+                                        </div>
+                                    </div>
                                 </div>
+
+                                <input type="file" value="add reference" class="btn btn-primary" style="width:70%;" ng-hide="attachReference" />
                             </div>
                             <div>
-                                <label>Enc. room</label>
-                                <div>
-                                    <select class="selectpicker" data-live-search="true"></select>
+                                <!-- col 3  -->
+                                <!-- encryptor currrent data  -->
+                                <div class="form-group">
+                                    <label> Encryptor Serial number</label>
+                                    <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.serialNumber">
+                                </div>
+                                <div class="form-group">
+                                    <label>Time-stamp</label>
+                                    <input type="datetime" class="form-control" readonly ng-model="tempDataForEditWindow.timestampAsString">
+                                </div>
+                                <div class="form-group flex-container">
+                                    <div class="form-group">
+                                        <label>ownerID</label>
+                                        <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.ownerID">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>status</label>
+                                        <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.status">
+                                    </div>
+                                </div>
+                                <div class="form-group flex-container">
+                                    <div class="form-group">
+                                        <label>facility</label>
+                                        <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.deviceLocation.facility" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>building</label>
+                                        <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.deviceLocation.building" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>floor</label>
+                                        <input type="number" class="form-control" readonly ng-model="tempDataForEditWindow.deviceLocation.floor" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>room</label>
+                                        <input type="number" class="form-control" readonly ng-model="tempDataForEditWindow.deviceLocation.room" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                        <div ng-hide="approveInUse"><input type="checkbox" />I declare that I have seen this Encryptor with my own eyes</div>
                         <div class="container">
                             <div style="width:70%; height: 100px; margin:10px">
                                 <label>Edit reasons</label>
