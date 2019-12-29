@@ -63,8 +63,7 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
                 $scope.userEncryptors.push(record);
             });
              //loading map object
-            $scope.initialize();
-           
+            $scope.initialize(); 
            // $('selectStatus option[value=' + $scope.userEncryptors + "']").attr("selected", "selected");
         });
         //getting user details  
@@ -98,7 +97,8 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
 
 
     };
-    $scope.ReportAbout = function (reportReason) {
+
+    $scope.ReportAbout = function () {
         var reason = $scope.SelectesReasonReport
         switch (reason) {
             case 'monthly report':
@@ -134,8 +134,7 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
                 $scope.ReasonToUpdate = false;
                 $scope.employees = []; 
                 getAllEmployees();
-                break;
-                
+                break;   
         }
     };
 
