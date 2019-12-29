@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Web.Mvc;
 using webTry2.Controllers;
 using webTry2.Models;
@@ -6,9 +7,9 @@ using webTry2.Models;
 
 namespace WEB_project.Controllers
 {
-    public class EmployeeController : Controller
+    public class EmployeeController : DBController
     {
-        
+
 
         // GET: Employee
         public ActionResult employeePage()
@@ -25,6 +26,128 @@ namespace WEB_project.Controllers
 
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        [HttpPost]
+        public ActionResult getEmployeeList(string empUserName)
+        {
+            List<User> employees = new List<User>();
+            User temp;
+            bool dataReaderFlag = false;
+
+            connectToSQL();
+            sqlQuery = "select emp.userName, emp.firstName, emp.lastName " +
+                       " from Users as emp " +
+                       " where emp.userName <> '" + empUserName + "'";
+
+            command = new SqlCommand(sqlQuery, connectionToSql);
+            dataReader = command.ExecuteReader();
+            while (dataReader.Read())
+            {
+                dataReaderFlag = true;
+                temp = new User();
+                temp.userName = dataReader.GetValue(0).ToString();
+                temp.firstName = dataReader.GetValue(1).ToString();
+                temp.lastName = dataReader.GetValue(2).ToString();
+                employees.Add(temp);
+            }
+            closeConnectionAndReading();
+
+            if (dataReaderFlag == false)
+            {
+                return Json(null, JsonRequestBehavior.AllowGet);
+            }
+            return Json(employees, JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public ActionResult getBuildingList(string siteName)
+        {
+            List<string> buildings = new List<string>();
+            string temp;
+            bool dataReaderFlag = false;
+
+            connectToSQL();
+            sqlQuery = "select distinct L.building " +
+                "from Locations L " +
+                "where L.facility = '" + siteName + "'";
+
+
+            command = new SqlCommand(sqlQuery, connectionToSql);
+            dataReader = command.ExecuteReader();
+            while (dataReader.Read())
+            {
+                dataReaderFlag = true;
+                temp = dataReader.GetValue(0).ToString();
+                buildings.Add(temp);
+            }
+            closeConnectionAndReading();
+
+            if (dataReaderFlag == false)
+            {
+                return Json(null, JsonRequestBehavior.AllowGet);
+            }
+            return Json(buildings, JsonRequestBehavior.AllowGet);
+        }
+
+
+        [HttpPost]
+        public ActionResult getfloorsList(string siteName,string buildName)
+        {
+            List<string> floors = new List<string>();
+            string temp;
+            bool dataReaderFlag = false;
+
+            connectToSQL();
+            sqlQuery = "select distinct L.floor" +
+                        " from Locations L" +
+                        " where L.facility = '" + siteName + "'and L.building = '" + buildName + "';";
+
+            command = new SqlCommand(sqlQuery, connectionToSql);
+            dataReader = command.ExecuteReader();
+            while (dataReader.Read())
+            {
+                dataReaderFlag = true;
+                temp = dataReader.GetValue(0).ToString();
+                floors.Add(temp);
+            }
+            closeConnectionAndReading();
+
+            if (dataReaderFlag == false)
+            {
+                return Json(null, JsonRequestBehavior.AllowGet);
+            }
+            return Json(floors, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult getRoomList(string siteName, string buildName, string floorNumber)
+        {
+            List<string> rooms = new List<string>();
+            string temp;
+            bool dataReaderFlag = false;
+
+            connectToSQL();
+            sqlQuery = "select distinct L.room"+
+                        " from Locations L"+
+                        " where L.floor = '"+floorNumber+"' and L.facility = '"+ siteName + "'and L.building = '"+ buildName + "'; ";
+
+            command = new SqlCommand(sqlQuery, connectionToSql);
+            dataReader = command.ExecuteReader();
+            while (dataReader.Read())
+            {
+                dataReaderFlag = true;
+                temp = dataReader.GetValue(0).ToString();
+                rooms.Add(temp);
+            }
+            closeConnectionAndReading();
+
+            if (dataReaderFlag == false)
+            {
+                return Json(null, JsonRequestBehavior.AllowGet);
+            }
+            return Json(rooms, JsonRequestBehavior.AllowGet);
+        }
+
+
     }
 }
 

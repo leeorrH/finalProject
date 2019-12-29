@@ -1,12 +1,12 @@
 ﻿
 var app = angular.module("employeeAng", []);
-app.controller("employeePageContoller", function ($scope, $http, $location) {
+app.controller("employeePageContoller", function ($scope, $http, $location, $timeout) {
 
     var postData = $location.$$absUrl.split("?");
     $scope.userName = postData[1].split("=");
     $scope.userName = $scope.userName[1];
 
-    //for visibility component in employee report
+    //for visibility component in employee report - hide or visable
     $scope.deliverToEmpDetails = true;
     $scope.attachReference = true;
     $scope.locationDetails = true;
@@ -22,8 +22,6 @@ app.controller("employeePageContoller", function ($scope, $http, $location) {
     var markesrArray = [];
     $scope.gMap;
 
-    $scope.statusArray = []; // need to have all posible status
-    $scope.sitesLocationsArray = []; // have all locations buildings and coordinates
     //user basic deatails
     $scope.UserObj = {
         "UserName": "",
@@ -33,6 +31,15 @@ app.controller("employeePageContoller", function ($scope, $http, $location) {
         "phoneNumber": ""
     };
 
+    //for EDIT window
+    $scope.employees = []; //array of employees
+    $scope.buildings = []; //array of buildings
+    $scope.floors = []; //array of floors
+    $scope.rooms = []; //array of rooms
+
+    $scope.statusArray = []; // need to have all posible status
+    $scope.sitesLocationsArray = []; // have all locations buildings and coordinates
+    
     //variables for showing data on edit window
     $scope.tempDataForEditWindow;
     var tempDataIndex;
@@ -86,8 +93,13 @@ app.controller("employeePageContoller", function ($scope, $http, $location) {
        window.location.href = "/";
     };
 
-    $scope.ReportAbout=function(reportReason){
-        var reason = $scope.SelectesReasonReport;
+    //report function:
+    $scope.cleanReport = function () {
+
+
+    };
+    $scope.ReportAbout = function (reportReason) {
+        var reason = $scope.SelectesReasonReport
         switch (reason) {
             case 'monthly report':
                 $scope.approveInUse = false;
@@ -120,9 +132,122 @@ app.controller("employeePageContoller", function ($scope, $http, $location) {
                 $scope.attachReference = true;
                 $scope.EncChangeStatus = true;
                 $scope.ReasonToUpdate = false;
+                $scope.employees = []; 
+                getAllEmployees();
                 break;
                 
         }
+    };
+
+
+    function getAllEmployees() {
+        //getting employees
+        $http({
+            method: "POST",
+            data: { "empUserName": $scope.userName } ,
+            url: "getEmployeeList"
+        }).then(function (dataReturn) {
+
+            if (dataReturn.data == "") {
+                alert("no employee return");
+                console.log("get employees maybe fail");
+                return;
+            }
+            var data = dataReturn.data;
+
+            $.each(data, function (index, emp) {
+                $scope.employees.push(emp);
+            });
+
+            $timeout(function () {
+                    $('.selectpicker').selectpicker('refresh'); //put it in timeout for run digest cycle
+                }, 1)
+            .catch(() => {
+                console.log('nope');
+            });
+        });
+    }
+
+    $scope.getEmpValue = function () {
+        var employeeUserName = $scope.empID;
+    };
+
+    $scope.getBuildings = function () {
+        var x = $scope.siteName;
+        if ($scope.siteName == "") {
+            $scope.buildings = "";
+        }
+        else {
+            //getting building
+            $http({
+                method: "POST",
+                data: { "siteName": $scope.siteName },
+                url: "getBuildingList"
+            }).then(function (dataReturn) {
+
+                if (dataReturn.data == "") {
+                    // alert("no building return");
+                    console.log("get buildings maybe fail");
+                    return;
+                }
+                $scope.buildings = dataReturn.data;
+
+                $timeout(function () {
+                    $('.selectpicker').selectpicker('refresh'); //put it in timeout for run digest cycle
+                }, 1)
+                    .catch(() => {
+                        console.log('nope');
+                    });
+            });
+        }
+    };
+
+    $scope.getfloors = function () {
+        //getting floors
+        $http({
+            method: "POST",
+            data: { "siteName": $scope.siteName, "buildName": $scope.buildName },
+            url: "getfloorsList"
+        }).then(function (dataReturn) {
+
+            if (dataReturn.data == "") {
+                //alert("no floor return");
+                console.log("get floors maybe fail");
+                return;
+            }
+            $scope.floors = dataReturn.data;
+
+            $timeout(function () {
+                $('.selectpicker').selectpicker('refresh'); //put it in timeout for run digest cycle
+            }, 1)
+                .catch(() => {
+                    console.log('nope');
+                });
+        });
+    };
+
+    $scope.getroom = function () {
+        //getting room
+        $http({
+            method: "POST",
+            data: { "siteName": $scope.siteName, "buildName": $scope.buildName, "floorNumber": $scope.floorNumber },
+            url: "getRoomList"
+        }).then(function (dataReturn) {
+
+            if (dataReturn.data == "") {
+                alert("no room return");
+                console.log("get rooms maybe fail");
+                return;
+            }
+            $scope.rooms = dataReturn.data;
+
+            $timeout(function () {
+                $('.selectpicker').selectpicker('refresh'); //put it in timeout for run digest cycle
+            }, 1)
+                .catch(() => {
+                    console.log('nope');
+                });
+        });
     };
 
     /*      map view page , second page for employee        */
@@ -131,7 +256,7 @@ app.controller("employeePageContoller", function ($scope, $http, $location) {
         var searchIn = $('#searchInput').val();
         var result = $scope.userEncryptors.includes(searchIn);
         Console.log(result);
-    }
+    };
 
     $scope.initialize = function () {
         var googleMapOption = {
@@ -168,9 +293,10 @@ app.controller("employeePageContoller", function ($scope, $http, $location) {
     function clusterMarkers() {
         var markerCluster = new MarkerClusterer($scope.gMap, markesrArray,
             { imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' });
-    }
+    };
 
 });
+
 
 /*
 app.factory('dataSharing', function () {

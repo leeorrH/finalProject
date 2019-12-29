@@ -60,8 +60,7 @@ namespace webTry2.Controllers
             }
 
 
-            connectionToSql.Close();
-            dataReader.Close();
+            closeConnectionAndReading();
             //return Json(userEncryptors, JsonRequestBehavior.AllowGet);
             return userEncryptors;
         }

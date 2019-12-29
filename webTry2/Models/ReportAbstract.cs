@@ -8,7 +8,7 @@ namespace webTry2.Models
     public abstract class ReportAbstract
     {
         public int reportID { get; set; }
-        public String createdBy { get; set; }
+        public String reportOwner { get; set; }
         public DateTime date { get; set; }
         public String notifications { get; set; }
         public List<Encryptor> encryptorsList { get; set; } 

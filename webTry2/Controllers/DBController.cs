@@ -33,5 +33,11 @@ namespace webTry2.Controllers
                 Console.WriteLine("error while connecting to DB");
             }
         }
+
+        public void closeConnectionAndReading()
+        {
+            connectionToSql.Close();
+            dataReader.Close();
+        }
     }
 }

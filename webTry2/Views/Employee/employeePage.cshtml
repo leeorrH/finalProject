@@ -149,17 +149,18 @@
             <div class="modal-content">
                 <form>
                     <div class="modal-header">
-                            <h4 class="modal-title">Encryptor data</h4>
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Encryptor data</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cleanReport()">&times;</button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group flex-container">
                             <div class="form-group">
                                 <label>report about: </label>
                                 <div>
-                                    <select class="selectpicker" data-live-search="true" ng-model="SelectesReasonReport" ng-change="ReportAbout()">
+                                    <select id="firstPicker" class="selectpicker" data-live-search="true" ng-model="SelectesReasonReport" ng-change="ReportAbout()">
+                                        <option selected disabled value="default">Please Select</option>
                                         <option>monthly report</option>
-                                        <option selected>changing encryptor location</option>
+                                        <option>changing encryptor location</option>
                                         <option>changing encryptor status</option>
                                         <option>deliver to employee</option>
                                     </select>
@@ -181,13 +182,16 @@
                                 </div>
                                 <div ng-hide="deliverToEmpDetails" class="ng-hide">
                                     <label>Enc. deliver to: </label>
-                                    <select class="selectpicker" data-live-search="true"></select>
+                                    <select ng-model="empID" ng-options="employee as employee.userName + ' - ' + employee.firstName + ' ' + employee.lastName
+                                                        for employee in employees track by employee.UserName" ng-change="getEmpValue()"
+                                            class="selectpicker" data-live-search="true"></select>
+
                                 </div>
                                 <div ng-hide="locationDetails" class="ng-hide">
                                     <div class="form-group">
                                         <label>Enc. site: </label>
                                         <div>
-                                            <select class="selectpicker" data-live-search="true">
+                                            <select class="selectpicker" data-live-search="true" ng-model="siteName" ng-change="getBuildings()">
                                                 <option data-tokens="leshem">Leshem</option>
                                                 <option data-tokens="david">David</option>
                                                 <option data-tokens="beer sheva">Be'er Sheva</option>
@@ -197,19 +201,22 @@
                                     <div>
                                         <label>Enc. building: </label>
                                         <div>
-                                            <select class="selectpicker" data-live-search="true"></select>
+                                            <select ng-model="buildName" ng-options="building as building
+                                                        for building in buildings" ng-change="getfloors()" class="selectpicker" data-live-search="true"></select>
                                         </div>
                                     </div>
                                     <div>
                                         <label>Enc. floor</label>
                                         <div>
-                                            <select class="selectpicker" data-live-search="true"></select>
+                                            <select ng-model="floorNumber" ng-options="floor as floor
+                                                        for floor in floors" ng-change="getroom()" class="selectpicker" data-live-search="true"></select>
                                         </div>
                                     </div>
                                     <div>
                                         <label>Enc. room</label>
                                         <div>
-                                            <select class="selectpicker" data-live-search="true"></select>
+                                            <select ng-model="floors" ng-options="room as room
+                                                        for room in rooms" class="selectpicker" data-live-search="true"></select>
                                         </div>
                                     </div>
                                 </div>

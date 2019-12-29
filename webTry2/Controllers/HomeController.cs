@@ -5,22 +5,12 @@ using System.Data.SqlClient;
 
 namespace webTry2.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : DBController
     {
-        private string connectionString;
-        private SqlConnection connectionToSql;
-        SqlCommand command;
-        SqlDataReader dataReader;
-        String sqlQuery;
         User userReturn = new User();
+
         public HomeController()
         {
-            //initilaize parameters for controller
-            connectionString = "Data Source=DESKTOP-7NV1617\\SQLEXPRESS;" +
-                                      "Initial Catalog=project_DB;" +
-                                         "Integrated Security=True";
-
-            connectionToSql = new SqlConnection(connectionString);
             
         }
         public ActionResult Index()
@@ -36,15 +26,7 @@ namespace webTry2.Controllers
             if(userObj.userName == null)
                 return Json(userReturn, JsonRequestBehavior.AllowGet);
 
-            try
-            {
-                connectionToSql.Open();
-
-            }
-            catch (SqlException)
-            {
-                Console.WriteLine("error while connecting to DB");
-            }
+            connectToSQL();
 
             //sql auery for validate user name and password
             sqlQuery = "select *" +
@@ -64,9 +46,8 @@ namespace webTry2.Controllers
                 userReturn.password = dataReader.GetValue(1).ToString();
                 userReturn.permission = dataReader.GetValue(6).ToString();
             }
-            // check if datareader != null 
-            connectionToSql.Close();
-            dataReader.Close();
+
+            closeConnectionAndReading();
 
             //in case there is no such user in DB
             if (dataReaderFlag == false) return Json(null, JsonRequestBehavior.AllowGet);
@@ -79,16 +60,7 @@ namespace webTry2.Controllers
         [HttpPost]
         public ActionResult userRegistration(User userObj)
         {
-            try
-            {
-                connectionToSql.Open();
-
-            }
-            catch (SqlException)
-            {
-                Console.WriteLine("error while connecting to DB");
-
-            }
+            connectToSQL();
 
             //need to pay attention to put ' ' between rows when writing sql query ! 
             sqlQuery = "INSERT INTO Users" +
@@ -107,14 +79,18 @@ namespace webTry2.Controllers
             try
             {
                 dataReader = command.ExecuteReader();
+                closeConnectionAndReading();
                 return Json("Registration Success", JsonRequestBehavior.AllowGet);
             }
             catch(SqlException e)
             {
                 System.Console.Write(e.ToString());
+                closeConnectionAndReading();
                 return Json(null, JsonRequestBehavior.AllowGet);
             }
 
         }
+
+
     }
 }

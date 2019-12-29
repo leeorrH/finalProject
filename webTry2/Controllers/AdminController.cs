@@ -7,22 +7,11 @@ using webTry2.Models;
 
 namespace webTry2.Controllers
 {
-    public class AdminController : Controller
+    public class AdminController : DBController
     {
-        private string connectionString;
-        private SqlConnection connectionToSql;
-        SqlCommand command;
-        SqlDataReader dataReader;
-        String sqlQuery;
-
+       
         public AdminController()
         {
-            //initilaize parameters for controller
-            connectionString = "Data Source=DESKTOP-7NV1617\\SQLEXPRESS;" +
-                                      "Initial Catalog=project_DB;" +
-                                         "Integrated Security=True";
-
-            connectionToSql = new SqlConnection(connectionString);
         }
 
         // GET: Admin
@@ -37,15 +26,7 @@ namespace webTry2.Controllers
         {
             List<Encryptor> userEncryptors = new List<Encryptor>();
             //connection to DB 
-            try
-            {
-                connectionToSql.Open();
-
-            }
-            catch (SqlException)
-            {
-                Console.WriteLine("error while connecting to DB");
-            }
+            connectToSQL();
 
             //query for getting ALL encryptors and thier location from the user
             sqlQuery = "select enc.SN, enc.ownerID, CONVERT(varchar,enc.timeStamp,20) ,stat.statusName , loc.* " +
@@ -86,8 +67,7 @@ namespace webTry2.Controllers
             }
 
 
-            connectionToSql.Close();
-            dataReader.Close();
+            closeConnectionAndReading();
             return Json(userEncryptors, JsonRequestBehavior.AllowGet);
         }
     }
