@@ -157,8 +157,8 @@
                             <div class="form-group">
                                 <label>report about: </label>
                                 <div>
-                                    <select id="firstPicker" class="selectpicker" data-live-search="true" ng-model="SelectesReasonReport" ng-change="ReportAbout()">
-                                        <option selected disabled value="default">Please Select</option>
+                                    <select class="selectpicker" data-live-search="true" ng-model="SelectesReasonReport" ng-change="ReportAbout()">
+                                        <option ng-selected disabled value="">Please Select</option>
                                         <option>monthly report</option>
                                         <option>changing encryptor location</option>
                                         <option>changing encryptor status</option>
@@ -172,7 +172,7 @@
                                     <div class="form-group">
                                         <label>Enc. status: </label>
                                         <div>
-                                            <select class="selectpicker" data-live-search="true">
+                                            <select ng-model="encStatus" class="selectpicker" data-live-search="true">
                                                 <option>destroyed</option>
                                                 <option>lost</option>
                                                 <option>deliverd </option>
@@ -182,10 +182,9 @@
                                 </div>
                                 <div ng-hide="deliverToEmpDetails" class="ng-hide">
                                     <label>Enc. deliver to: </label>
-                                    <select ng-model="empID" ng-options="employee as employee.userName + ' - ' + employee.firstName + ' ' + employee.lastName
+                                    <select reference="toReset" ng-model="empID" ng-options="employee as employee.userName + ' - ' + employee.firstName + ' ' + employee.lastName
                                                         for employee in employees track by employee.UserName" ng-change="getEmpValue()"
-                                            class="selectpicker" data-live-search="true"></select>
-
+                                            class="selectpicker" data-live-search="true"></select>                                    
                                 </div>
                                 <div ng-hide="locationDetails" class="ng-hide">
                                     <div class="form-group">
@@ -201,27 +200,27 @@
                                     <div>
                                         <label>Enc. building: </label>
                                         <div>
-                                            <select ng-model="buildName" ng-options="building as building
+                                            <select reference="toReset" ng-model="buildName" ng-options="building as building
                                                         for building in buildings" ng-change="getfloors()" class="selectpicker" data-live-search="true"></select>
                                         </div>
                                     </div>
                                     <div>
                                         <label>Enc. floor</label>
                                         <div>
-                                            <select ng-model="floorNumber" ng-options="floor as floor
+                                            <select reference="toReset" ng-model="floorNumber" ng-options="floor as floor
                                                         for floor in floors" ng-change="getroom()" class="selectpicker" data-live-search="true"></select>
                                         </div>
                                     </div>
                                     <div>
                                         <label>Enc. room</label>
                                         <div>
-                                            <select ng-model="floors" ng-options="room as room
+                                            <select reference="toReset" ng-model="room" ng-options="room as room
                                                         for room in rooms" class="selectpicker" data-live-search="true"></select>
                                         </div>
                                     </div>
                                 </div>
 
-                                <input type="file" value="add reference" class="btn btn-primary" style="width:70%;" ng-hide="attachReference" />
+                                <input type="file" value="add reference" class="btn btn-primary" style="width:70%;" ng-hide="attachReference" required/>
                             </div>
                             <div>
                                 <!-- col 3  -->
@@ -264,17 +263,16 @@
                                 </div>
                             </div>
                         </div>
-                        <div ng-hide="approveInUse"><input type="checkbox" />I declare that I have seen this Encryptor with my own eyes</div>
+                        <div ng-hide="approveInUse"><input type="checkbox" required/>I declare that I have seen this Encryptor with my own eyes</div>
                         <div class="container">
                             <div style="width:70%; height: 100px; margin:10px">
-                                <label>Edit reasons</label>
+                                <label>notifications</label>
                                 <textarea class="form-control" style="height: 80%" required
-                                          placeholder="please enter reasons why there is a need for update for example:
-                                          moving for new project project end etc."></textarea>
+                                           ng-model="notification"></textarea>
                             </div>
                             <label>Please pay attention that the time stamp field will update automaticly when submited.</label>
                             <div>
-                                <button type="submit" class="btn btn-primary pull-right" style="margin-right:10%"> Send report </button>
+                                <button type="submit" class="btn btn-primary pull-right" style="margin-right:10%" ng-click="sendReport()"> Send report </button>
                             </div>
                         </div>
                     </div>

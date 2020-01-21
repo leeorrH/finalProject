@@ -10,13 +10,14 @@ namespace webTry2.Models
         public int reportID { get; set; }
         public String reportOwner { get; set; }
         public DateTime date { get; set; }
+        public string dateAsString;
         public String notifications { get; set; }
-        public List<Encryptor> encryptorsList { get; set; } 
 
         public ReportAbstract()
         {
             date = DateTime.Now;
-            encryptorsList = new List<Encryptor>();
+            dateAsString = date.ToString();
+         
         }
 
     }

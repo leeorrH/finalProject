@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Web.Mvc;
+using WEB_project.Controllers;
 using webTry2.Models;
 
 namespace webTry2.Controllers
 {
-    public class AdminController : DBController
+    public class AdminController : EmployeeController
     {
        
         public AdminController()
@@ -22,7 +23,7 @@ namespace webTry2.Controllers
 
         //loadAllEncryptors - function that get all encryptors from SQL DB
         [HttpPost]
-        public ActionResult loadAllEncryptors()
+        public override ActionResult loadEmployeeEncryptors(string userName)
         {
             List<Encryptor> userEncryptors = new List<Encryptor>();
             //connection to DB 
