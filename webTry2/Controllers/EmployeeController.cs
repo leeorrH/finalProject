@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Web.Mvc;
 using webTry2.Controllers;
@@ -18,7 +19,7 @@ namespace WEB_project.Controllers
         }
 
         [HttpPost]
-        public ActionResult loadEmployeeEncryptors(string userName)
+        public virtual ActionResult loadEmployeeEncryptors(string userName)
         {
             encryptorSubController encCntrl = new encryptorSubController();
 
@@ -58,6 +59,7 @@ namespace WEB_project.Controllers
             }
             return Json(employees, JsonRequestBehavior.AllowGet);
         }
+
         [HttpPost]
         public ActionResult getBuildingList(string siteName)
         {
@@ -147,8 +149,31 @@ namespace WEB_project.Controllers
             return Json(rooms, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpPost]
+        public ActionResult SendMonthlyReport(List<string> empReportList)
+        {
+// string sqlFormattedDate = empReportList[0];
+            //     connectToSQL();
+            /*       try
+                   {
+                       sqlQuery = "INSERT INTO dbo.EmployeeReport (reportOwner, date,encSN, ownerID,encStatus,location,notifications,reference,approvementStatus)" +
+                   "VALUES(empReport.reportOwner, sqlFormattedDate, '203', '10000', 1, 4, 'bla bla', NULL, 'false'); ";
+
+                       command = new SqlCommand(sqlQuery, connectionToSql);
+
+                       closeConnectionAndReading();
+                   }catch(Exception ex)
+                   {
+                       Console.WriteLine("sql fail");
+                       return Json("sql fail", JsonRequestBehavior.AllowGet);
+                   }*/
+            return Json("sql success", JsonRequestBehavior.AllowGet);
+
+        }
+
 
     }
+
 }
 
 

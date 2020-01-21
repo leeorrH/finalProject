@@ -52,7 +52,8 @@ app.controller("adminPageContoller", function ($scope, $http, $location) {
         $http({
             method: "POST",
             //url define what function we apply to when post to the server
-            url: "loadAllEncryptors"
+            url: "loadEmployeeEncryptors",
+            data: { userName : ""}
         }).then(function (dataReturn) {
             var data = dataReturn.data;
 

@@ -30,6 +30,38 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
         "email": "",
         "phoneNumber": ""
     };
+    //employee report basic deatails
+    var empReport = {
+        reportID: "",
+        reportOwner: "",
+        date: "",
+        notifications: "",
+        encryptor: "",
+        reference: "",
+        approvementStatus: ""
+    };
+    //encryptor report basic deatails
+ /*   var encryptor = {
+        serialNumber: "",
+        timestamp: {},
+        timestampAsString: "",
+        ownerID: "",
+        status:"",
+        deviceLocation: {}
+    };*/
+
+     //location report basic deatails
+    var location = {
+        locationID:"",
+        facility: "",
+        building:"",
+        floor:"",
+        room: "",
+        latitude: "",
+        longitude: ""
+    }
+    var empReportArr = [];
+
 
     //for EDIT window
     $scope.employees = []; //array of employees
@@ -42,7 +74,7 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
     
     //variables for showing data on edit window
     $scope.tempDataForEditWindow;
-    var tempDataIndex;
+    var tempDataIndex = 0;
 
     /*              controller functions                   */
 
@@ -72,34 +104,55 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
 
     //function for display and update 
     $scope.getRowData = function (index) {
+        tempDataIndex = index;
         $scope.tempDataForEditWindow = $scope.userEncryptors[index];
         //select initialize 
         switch ($scope.userEncryptors[index].status) {
             case "in use":
                 $('#statusSelect').val('1');
+                break;
             case "destroyed":
                 $('#statusSelect').val('2');
+                break;
             case "lost":
                 $('#statusSelect').val('3');
-            case "delivered": 
+                break;
+            case "delivered":
                 $('#statusSelect').val('4');
-            default: 
+                break;
+            default:
                 $('#statusSelect').val('1');
+                break;
         }
-        tempDataIndex = index;
     }; 
 
     $scope.logout = function () {
        window.location.href = "/";
     };
 
-    //report function:
+    //report functions:
     $scope.cleanReport = function () {
+        $('.selectpicker').selectpicker();
+        $('.selectpicker').selectpicker('val', '');
+        $('.selectpicker[reference="toReset"]').html('');
+        $('.selectpicker').selectpicker('refresh');
 
+        $scope.approveInUse = true;
+        $scope.deliverToEmpDetails = true;
+        $scope.attachReference = true;
+        $scope.locationDetails = true;
+        $scope.EncChangeStatus = true;
 
+        $scope.SelectesReasonReport = "";
+        $scope.encStatus = "";
+        $scope.siteName = "";
+        $scope.buildName = "";
+        $scope.floorNumber = "";
+        $scope.room = "";
     };
+
     $scope.ReportAbout = function (reportReason) {
-        var reason = $scope.SelectesReasonReport
+        var reason = $scope.SelectesReasonReport;
         switch (reason) {
             case 'monthly report':
                 $scope.approveInUse = false;
@@ -107,7 +160,6 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
                 $scope.attachReference = true;
                 $scope.locationDetails = true;
                 $scope.EncChangeStatus = true;
-                $scope.ReasonToUpdate = true;
                 break;
             case 'changing encryptor location':
                 $scope.approveInUse = true;
@@ -115,7 +167,6 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
                 $scope.deliverToEmpDetails = true;
                 $scope.attachReference = true;
                 $scope.EncChangeStatus = true;
-                $scope.ReasonToUpdate = false;
                 break;
             case 'changing encryptor status':
                 $scope.approveInUse = true;
@@ -123,7 +174,6 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
                 $scope.attachReference = false;
                 $scope.locationDetails = true;
                 $scope.EncChangeStatus = false;
-                $scope.ReasonToUpdate = false;
                 break;
             case 'deliver to employee':
                 $scope.approveInUse = true;
@@ -131,11 +181,9 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
                 $scope.deliverToEmpDetails = false;
                 $scope.attachReference = true;
                 $scope.EncChangeStatus = true;
-                $scope.ReasonToUpdate = false;
                 $scope.employees = []; 
                 getAllEmployees();
                 break;
-                
         }
     };
 
@@ -248,6 +296,49 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
                     console.log('nope');
                 });
         });
+    };
+
+    $scope.sendReport = function () {
+        var reason = $scope.SelectesReasonReport;
+        var referance;
+        var newStatus;
+        switch (reason) {
+            case 'monthly report':
+                
+                $http({
+                    method: "POST",
+                    data: {
+                        ["reportOwner": $scope.userEncryptors[tempDataIndex].ownerID,
+                        "ENserialNumber": $scope.userEncryptors[tempDataIndex].serialNumber,
+                        "status": $scope.userEncryptors[tempDataIndex].status,
+                        "deviceLocationID": $scope.userEncryptors[tempDataIndex].deviceLocation.locationID]
+                    },
+                    url: "sendMonthlyReport"
+                });
+                break;
+            case 'changing encryptor location':
+             /*   var x= $scope.approveInUse;
+                $scope.locationDetails = false;
+                $scope.deliverToEmpDetails = true;
+                $scope.attachReference = true;
+                $scope.EncChangeStatus = true;*/
+                break;
+            case 'changing encryptor status':
+            /*    referance=$scope.attachReference;
+                newStatus=$scope.EncChangeStatus;
+                reason = $scope.ReasonToUpdate;
+                new employeeReport(referance);*/
+                break;
+            case 'deliver to employee':
+              /*  $scope.approveInUse = true;
+                $scope.locationDetails = false;
+                $scope.deliverToEmpDetails = false;
+                $scope.attachReference = true;
+                $scope.EncChangeStatus = true;
+                $scope.employees = [];
+                getAllEmployees();*/
+                break;
+        }
     };
 
     /*      map view page , second page for employee        */
