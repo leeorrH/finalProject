@@ -36,19 +36,19 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
         reportOwner: "",
         date: "",
         notifications: "",
-        encryptor: "",
+        Encryptor: "",
         reference: "",
         approvementStatus: ""
     };
     //encryptor report basic deatails
- /*   var encryptor = {
+      var Encryptor = {
         serialNumber: "",
-        timestamp: {},
+        timestamp: null,
         timestampAsString: "",
         ownerID: "",
         status:"",
-        deviceLocation: {}
-    };*/
+        deviceLocation: null
+    };
 
      //location report basic deatails
     var location = {
@@ -304,15 +304,19 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
         var newStatus;
         switch (reason) {
             case 'monthly report':
-                
+                empReport.reportOwner = $scope.userEncryptors[tempDataIndex].ownerID;
+                empReport.notifications = $scope.notification;
+
+
+                empReport.Encryptor = $scope.userEncryptors[tempDataIndex];
                 $http({
                     method: "POST",
-                    data: {
-                        ["reportOwner": $scope.userEncryptors[tempDataIndex].ownerID,
-                        "ENserialNumber": $scope.userEncryptors[tempDataIndex].serialNumber,
-                        "status": $scope.userEncryptors[tempDataIndex].status,
-                        "deviceLocationID": $scope.userEncryptors[tempDataIndex].deviceLocation.locationID]
-                    },
+                    data: empReport
+                  /*      [$scope.userEncryptors[tempDataIndex].ownerID,
+                        $scope.userEncryptors[tempDataIndex].serialNumber,
+                        $scope.userEncryptors[tempDataIndex].status,
+                         $scope.userEncryptors[tempDataIndex].deviceLocation.locationID]*/
+                    ,
                     url: "sendMonthlyReport"
                 });
                 break;

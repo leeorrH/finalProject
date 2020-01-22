@@ -13,5 +13,10 @@ namespace webTry2.Models
         public string ownerID { get; set; }
         public string status { get; set; }
         public Location deviceLocation { get; set; }
+
+        public Encryptor(){
+        
+
+        }
     }
 }
