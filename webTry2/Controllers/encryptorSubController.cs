@@ -6,9 +6,9 @@ using System.Globalization;
 
 namespace webTry2.Controllers
 {
-    public class encryptorSubController : DBController
+    public class employeeReportSubController : DBController
     {
-        public encryptorSubController()
+        public employeeReportSubController()
         {
             //connect to sql
             connectToSQL();
@@ -64,6 +64,7 @@ namespace webTry2.Controllers
             //return Json(userEncryptors, JsonRequestBehavior.AllowGet);
             return userEncryptors;
         }
+
 
     }
 }

@@ -21,7 +21,7 @@ namespace WEB_project.Controllers
         [HttpPost]
         public virtual ActionResult loadEmployeeEncryptors(string userName)
         {
-            encryptorSubController encCntrl = new encryptorSubController();
+            employeeReportSubController encCntrl = new employeeReportSubController();
 
             List<Encryptor> result = encCntrl.loadEncryptorByUser(userName);
 
@@ -40,15 +40,14 @@ namespace WEB_project.Controllers
                        " from Users as emp " +
                        " where emp.userName <> '" + empUserName + "'";
 
-            command = new SqlCommand(sqlQuery, connectionToSql);
-            dataReader = command.ExecuteReader();
-            while (dataReader.Read())
+            SqlDataReader result = sendSqlQuery(sqlQuery);
+            while (result.Read())
             {
                 dataReaderFlag = true;
                 temp = new User();
-                temp.userName = dataReader.GetValue(0).ToString();
-                temp.firstName = dataReader.GetValue(1).ToString();
-                temp.lastName = dataReader.GetValue(2).ToString();
+                temp.userName = result.GetValue(0).ToString();
+                temp.firstName = result.GetValue(1).ToString();
+                temp.lastName = result.GetValue(2).ToString();
                 employees.Add(temp);
             }
             closeConnectionAndReading();
@@ -72,13 +71,11 @@ namespace WEB_project.Controllers
                 "from Locations L " +
                 "where L.facility = '" + siteName + "'";
 
-
-            command = new SqlCommand(sqlQuery, connectionToSql);
-            dataReader = command.ExecuteReader();
-            while (dataReader.Read())
+            SqlDataReader result = sendSqlQuery(sqlQuery);
+            while (result.Read())
             {
                 dataReaderFlag = true;
-                temp = dataReader.GetValue(0).ToString();
+                temp = result.GetValue(0).ToString();
                 buildings.Add(temp);
             }
             closeConnectionAndReading();
@@ -103,12 +100,11 @@ namespace WEB_project.Controllers
                         " from Locations L" +
                         " where L.facility = '" + siteName + "'and L.building = '" + buildName + "';";
 
-            command = new SqlCommand(sqlQuery, connectionToSql);
-            dataReader = command.ExecuteReader();
-            while (dataReader.Read())
+            SqlDataReader result = sendSqlQuery(sqlQuery);
+            while (result.Read())
             {
                 dataReaderFlag = true;
-                temp = dataReader.GetValue(0).ToString();
+                temp = result.GetValue(0).ToString();
                 floors.Add(temp);
             }
             closeConnectionAndReading();
@@ -132,9 +128,8 @@ namespace WEB_project.Controllers
                         " from Locations L"+
                         " where L.floor = '"+floorNumber+"' and L.facility = '"+ siteName + "'and L.building = '"+ buildName + "'; ";
 
-            command = new SqlCommand(sqlQuery, connectionToSql);
-            dataReader = command.ExecuteReader();
-            while (dataReader.Read())
+            SqlDataReader result = sendSqlQuery(sqlQuery);
+            while (result.Read())
             {
                 dataReaderFlag = true;
                 temp = dataReader.GetValue(0).ToString();
@@ -150,29 +145,39 @@ namespace WEB_project.Controllers
         }
 
         [HttpPost]
-        public ActionResult SendMonthlyReport(List<string> empReportList)
+        public ActionResult SendReport(List<string> empReport)
         {
-// string sqlFormattedDate = empReportList[0];
-            //     connectToSQL();
-            /*       try
-                   {
-                       sqlQuery = "INSERT INTO dbo.EmployeeReport (reportOwner, date,encSN, ownerID,encStatus,location,notifications,reference,approvementStatus)" +
-                   "VALUES(empReport.reportOwner, sqlFormattedDate, '203', '10000', 1, 4, 'bla bla', NULL, 'false'); ";
+            DateTime dateTime = DateTime.Now;
+            string sqlFormattedDate = dateTime.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            empReport[2] = sqlFormattedDate;
+            //employeeReportSubController need to be remove as a reference to encryptorSubController
+            EmployeeReportSubController empRepCtrl = new EmployeeReportSubController();
+            try
+            {
+                switch (empReport[0])
+                {
+                    case "monthly report":
+                        empRepCtrl.SendMonthlyReport(empReport);
+                        break;
+                    case "changing encryptor location":
+                        empRepCtrl.ChangingEncLocationReport(empReport);
+                        break;
+                }
+                closeConnectionAndReading();
 
-                       command = new SqlCommand(sqlQuery, connectionToSql);
-
-                       closeConnectionAndReading();
-                   }catch(Exception ex)
-                   {
-                       Console.WriteLine("sql fail");
-                       return Json("sql fail", JsonRequestBehavior.AllowGet);
-                   }*/
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("sql fail");
+                return Json("sql fail", JsonRequestBehavior.AllowGet);
+            }
             return Json("sql success", JsonRequestBehavior.AllowGet);
 
         }
 
 
     }
+
 
 }
 

@@ -150,6 +150,7 @@
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\DBController.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
+    <Compile Include="Controllers\EmployeeReportSubController.cs" />
     <Compile Include="Controllers\encryptorSubController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">

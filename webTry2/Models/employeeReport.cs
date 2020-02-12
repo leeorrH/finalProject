@@ -7,22 +7,22 @@ namespace webTry2.Models
 {
     public class employeeReport : ReportAbstract
     {
-        public Encryptor encryptor;
-        public String reference { get; set; }
-        public bool approvementStatus { get; set; } = false;
-
+        public string encryptorID;
+        public String reference ;
+        public bool approvementStatus;
+        public string encNewStatus;
 
         public employeeReport() {
    //       encryptor= new Encryptor();
         }
 
-        public employeeReport(string owner, DateTime reportDate, string encSerialNum, string encryptorStatus)
+   /*     public employeeReport(string owner, DateTime reportDate, string encSerialNum, string encryptorStatus)
         {
             reportOwner = owner;
             date = reportDate;
-            encryptor.serialNumber = encSerialNum;
-            encryptor.status = encryptorStatus;
-        }
+            encryptorID = encSerialNum;
+            encNewStatus = encryptorStatus;
+        }*/
     }
 
 }

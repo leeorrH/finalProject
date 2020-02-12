@@ -36,9 +36,10 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
         reportOwner: "",
         date: "",
         notifications: "",
-        Encryptor: "",
+        encryptorID: "",
         reference: "",
-        approvementStatus: ""
+        approvementStatus: "",
+        encNewStatus:""
     };
     //encryptor report basic deatails
       var Encryptor = {
@@ -61,7 +62,7 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
         longitude: ""
     }
     var empReportArr = [];
-
+    var newLocationID=-1;
 
     //for EDIT window
     $scope.employees = []; //array of employees
@@ -132,6 +133,10 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
 
     //report functions:
     $scope.cleanReport = function () {
+        cleanReport();
+    };
+
+    function cleanReport(){
         $('.selectpicker').selectpicker();
         $('.selectpicker').selectpicker('val', '');
         $('.selectpicker[reference="toReset"]').html('');
@@ -149,7 +154,7 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
         $scope.buildName = "";
         $scope.floorNumber = "";
         $scope.room = "";
-    };
+    }
 
     $scope.ReportAbout = function (reportReason) {
         var reason = $scope.SelectesReasonReport;
@@ -302,47 +307,39 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
         var reason = $scope.SelectesReasonReport;
         var referance;
         var newStatus;
+        
+        empReportArr[1] = $scope.userEncryptors[tempDataIndex].ownerID;
+        empReportArr[2] = null;
+        empReportArr[3] = $scope.userEncryptors[tempDataIndex].serialNumber;
         switch (reason) {
             case 'monthly report':
-                empReport.reportOwner = $scope.userEncryptors[tempDataIndex].ownerID;
-                empReport.notifications = $scope.notification;
-
-
-                empReport.Encryptor = $scope.userEncryptors[tempDataIndex];
-                $http({
-                    method: "POST",
-                    data: empReport
-                  /*      [$scope.userEncryptors[tempDataIndex].ownerID,
-                        $scope.userEncryptors[tempDataIndex].serialNumber,
-                        $scope.userEncryptors[tempDataIndex].status,
-                         $scope.userEncryptors[tempDataIndex].deviceLocation.locationID]*/
-                    ,
-                    url: "sendMonthlyReport"
-                });
+                empReportArr[0] = "monthly report";
+                empReportArr[4] = "monthly report:  " + ($scope.notification == undefined ? "" : $scope.notification);
                 break;
             case 'changing encryptor location':
-             /*   var x= $scope.approveInUse;
-                $scope.locationDetails = false;
-                $scope.deliverToEmpDetails = true;
-                $scope.attachReference = true;
-                $scope.EncChangeStatus = true;*/
+                empReportArr[0] = "changing encryptor location";
+                empReportArr[5] = $scope.siteName;
+                empReportArr[6] = $scope.buildName;
+                empReportArr[7] = $scope.floorNumber;
+                empReportArr[8] = $scope.room;
                 break;
             case 'changing encryptor status':
-            /*    referance=$scope.attachReference;
-                newStatus=$scope.EncChangeStatus;
-                reason = $scope.ReasonToUpdate;
-                new employeeReport(referance);*/
+                empReportArr[0] = "changing encryptor status";
+
                 break;
             case 'deliver to employee':
-              /*  $scope.approveInUse = true;
-                $scope.locationDetails = false;
-                $scope.deliverToEmpDetails = false;
-                $scope.attachReference = true;
-                $scope.EncChangeStatus = true;
-                $scope.employees = [];
-                getAllEmployees();*/
+                empReportArr[0] = "changing encryptor status";
                 break;
         }
+        $http({
+            method: "POST",
+            data: empReportArr,
+            url: "sendReport"
+        }).then(function (dataReturn) {
+            if (dataReturn.data = "sql success") alert("Report send successfully");
+            else alert("something go wrong, please try to send again");
+            cleanReport();   
+        });  
     };
 
     /*      map view page , second page for employee        */

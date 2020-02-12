@@ -9,7 +9,7 @@ namespace webTry2.Controllers
         private string connectionString;
         protected SqlConnection connectionToSql;
         public SqlCommand command;
-        public SqlDataReader dataReader;
+        public static SqlDataReader dataReader;
         public String sqlQuery;
 
         public DBController()
@@ -38,6 +38,20 @@ namespace webTry2.Controllers
         {
             connectionToSql.Close();
             dataReader.Close();
+        }
+
+        public SqlDataReader sendSqlQuery(string sqlQuery)
+        {
+            command = new SqlCommand(sqlQuery, connectionToSql);
+            dataReader = command.ExecuteReader();
+            return dataReader;
+        }
+        // sql query for Insert Delete or Update
+        public int sqlIUDoperation (string sqlIUDquery)
+        {
+            command = new SqlCommand(sqlIUDquery, connectionToSql);
+            int numberOfRowsEffected = (int)command.ExecuteNonQuery();
+            return numberOfRowsEffected;
         }
     }
 }
