@@ -30,37 +30,12 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
         "email": "",
         "phoneNumber": ""
     };
-    //employee report basic deatails
-    var empReport = {
-        reportID: "",
-        reportOwner: "",
-        date: "",
-        notifications: "",
-        encryptorID: "",
-        reference: "",
-        approvementStatus: "",
-        encNewStatus:""
-    };
-    //encryptor report basic deatails
-      var Encryptor = {
-        serialNumber: "",
-        timestamp: null,
-        timestampAsString: "",
-        ownerID: "",
-        status:"",
-        deviceLocation: null
-    };
 
-     //location report basic deatails
-    var location = {
-        locationID:"",
-        facility: "",
-        building:"",
-        floor:"",
-        room: "",
-        latitude: "",
-        longitude: ""
-    }
+    //changing status report
+
+   
+
+     
     var empReportArr = [];
     var newLocationID=-1;
 
@@ -154,6 +129,8 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
         $scope.buildName = "";
         $scope.floorNumber = "";
         $scope.room = "";
+
+        $scope.notification = "";
     }
 
     $scope.ReportAbout = function (reportReason) {
@@ -318,6 +295,7 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
                 break;
             case 'changing encryptor location':
                 empReportArr[0] = "changing encryptor location";
+                empReportArr[4] = "changing encryptor location:  "
                 empReportArr[5] = $scope.siteName;
                 empReportArr[6] = $scope.buildName;
                 empReportArr[7] = $scope.floorNumber;
