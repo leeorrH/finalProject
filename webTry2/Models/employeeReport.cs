@@ -7,10 +7,10 @@ namespace webTry2.Models
 {
     public class employeeReport : ReportAbstract
     {
-        public string encryptorID;
-        public String reference ;
-        public bool approvementStatus;
-        public string encNewStatus;
+        public string encryptorID { get; set; }
+        public string reference { get; set; }
+        public bool approvementStatus { get; set; }
+        public string encNewStatus { get; set; }
 
         public employeeReport() {
    //       encryptor= new Encryptor();

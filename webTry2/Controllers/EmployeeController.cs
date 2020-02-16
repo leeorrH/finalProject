@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 using System.Web.Mvc;
 using webTry2.Controllers;
 using webTry2.Models;
-
+using webTry2.Models.requests;
 
 namespace WEB_project.Controllers
 {
@@ -175,7 +175,12 @@ namespace WEB_project.Controllers
 
         }
 
-
+        [HttpPost]
+        public string testReport(ChangingOwnerReq empReport)
+        {
+            Console.WriteLine(empReport.ToString());
+            return "sql success";
+        }
     }
 
 

@@ -31,7 +31,7 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
         "phoneNumber": ""
     };
 
-    //changing status report
+    
 
    
 
@@ -291,7 +291,7 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
         switch (reason) {
             case 'monthly report':
                 empReportArr[0] = "monthly report";
-                empReportArr[4] = "monthly report:  " + ($scope.notification == undefined ? "" : $scope.notification);
+                empReportArr[4] = "monthly report:  " + (($scope.notification == undefined) ? "" : $scope.notification);
                 break;
             case 'changing encryptor location':
                 empReportArr[0] = "changing encryptor location";
@@ -306,7 +306,26 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
 
                 break;
             case 'deliver to employee':
-                empReportArr[0] = "changing encryptor status";
+                //empReportArr[0] = "changing encryptor status";
+                //new owner report
+                var changingOwnerReq = {
+                    requestOption: "deliver to employee",
+                    newEmpID: $scope.empID.userName,
+                    siteName: $scope.siteName,
+                    buldingName: $scope.buildName,
+                    floorNum: $scope.floorNumber,
+                    roomNum: $scope.room
+                };
+                $http({
+                    method: "POST",
+                    data: JSON.stringify({ 'empReport': changingOwnerReq }),
+                    //data: changingOwnerReq,
+                    url: "testReport"
+                }).then(function (dataReturn) {
+                    if (dataReturn.data = "sql success") alert("Report send successfully");
+                    else alert("something go wrong, please try to send again");
+                    cleanReport();
+                });  
                 break;
         }
         $http({
