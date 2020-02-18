@@ -162,6 +162,15 @@ namespace WEB_project.Controllers
                     case "changing encryptor location":
                         empRepCtrl.ChangingEncLocationReport(empReport);
                         break;
+                    case "changing encryptor status":
+
+                        break;
+                    case "deliver to employee":
+
+                        break;
+
+                    default:
+                        return Json("Error: request option not recognized", JsonRequestBehavior.AllowGet); ;
                 }
                 closeConnectionAndReading();
 

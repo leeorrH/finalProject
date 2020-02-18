@@ -283,7 +283,11 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
     $scope.sendReport = function () {
         var reason = $scope.SelectesReasonReport;
         var referance;
-        var newStatus;
+        var changingOwnerReq = {
+            requestOption: "",
+            newEmpID: "",
+            enc: $scope.userEncryptors[tempDataIndex]
+        };
         
         empReportArr[1] = $scope.userEncryptors[tempDataIndex].ownerID;
         empReportArr[2] = null;
@@ -302,20 +306,9 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
                 empReportArr[8] = $scope.room;
                 break;
             case 'changing encryptor status':
-                empReportArr[0] = "changing encryptor status";
-
-                break;
-            case 'deliver to employee':
                 //empReportArr[0] = "changing encryptor status";
-                //new owner report
-                var changingOwnerReq = {
-                    requestOption: "deliver to employee",
-                    newEmpID: $scope.empID.userName,
-                    siteName: $scope.siteName,
-                    buldingName: $scope.buildName,
-                    floorNum: $scope.floorNumber,
-                    roomNum: $scope.room
-                };
+                changingOwnerReq.requestOption = $scope.SelectesReasonReport;
+                changingOwnerReq.enc.status = $scope.encStatus;
                 $http({
                     method: "POST",
                     data: JSON.stringify({ 'empReport': changingOwnerReq }),
@@ -325,7 +318,13 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
                     if (dataReturn.data = "sql success") alert("Report send successfully");
                     else alert("something go wrong, please try to send again");
                     cleanReport();
-                });  
+                }); 
+                break;
+            case 'deliver to employee':
+                //empReportArr[0] = "changing encryptor status";
+                //new owner report
+                
+                 
                 break;
         }
         $http({
