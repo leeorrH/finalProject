@@ -131,11 +131,11 @@
                         </div>
                         <div class="form-group">
                             <label>floor</label>
-                            <input type="number" class="form-control" readonly ng-model="tempDataForEditWindow.deviceLocation.floor" />
+                            <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.deviceLocation.floor" />
                         </div>
                         <div class="form-group">
                             <label>room</label>
-                            <input type="number" class="form-control" readonly ng-model="tempDataForEditWindow.deviceLocation.room" />
+                            <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.deviceLocation.room" />
                         </div>
                     </div>
                 </form>
@@ -182,8 +182,8 @@
                                     </div>
                                     <div ng-hide="deliverToEmpDetails" class="ng-hide">
                                         <label>Enc. deliver to: </label>
-                                        <select reference="toReset" ng-model="empID" ng-options="employee as employee.userName + ' - ' + employee.firstName + ' ' + employee.lastName
-                                                        for employee in employees track by employee.UserName" ng-change="getEmpValue()"
+                                        <select reference="toReset" ng-model="emp" ng-options="employee as employee.userName + ' - ' + employee.firstName + ' ' + employee.lastName
+                                                        for employee in employees track by employee.UserName" 
                                                 class="selectpicker" data-live-search="true"></select>
                                     </div>
                                     <div ng-hide="locationDetails" class="ng-hide">
@@ -220,7 +220,7 @@
                                         </div>
                                     </div>
 
-                                    <input type="file" value="add reference" class="btn btn-primary" style="width:70%;" ng-hide="attachReference" required />
+                                    <input type="file" value="add reference" class="btn btn-primary" style="width:70%;" ng-model ="refFile" ng-hide="attachReference" required />
                                 </div>
                                 <div>
                                     <!-- col 3  -->
@@ -254,11 +254,11 @@
                                         </div>
                                         <div class="form-group">
                                             <label>floor</label>
-                                            <input type="number" class="form-control" readonly ng-model="tempDataForEditWindow.deviceLocation.floor" />
+                                            <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.deviceLocation.floor" />
                                         </div>
                                         <div class="form-group">
                                             <label>room</label>
-                                            <input type="number" class="form-control" readonly ng-model="tempDataForEditWindow.deviceLocation.room" />
+                                            <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.deviceLocation.room" />
                                         </div>
                                     </div>
                                 </div>

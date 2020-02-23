@@ -5,9 +5,10 @@ using System.Web;
 
 namespace webTry2.Models.requests
 {
-    public class ChangingOwnerReq
+    public class EmpReport : ReportAbstract
     {
-        public string requestOption { get; set; }
         public Encryptor enc { get; set; }
+        public string reference { get; set; }
+        public bool approvementStatus { get; set; }
     }
 }

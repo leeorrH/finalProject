@@ -33,12 +33,6 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
 
     
 
-   
-
-     
-    var empReportArr = [];
-    var newLocationID=-1;
-
     //for EDIT window
     $scope.employees = []; //array of employees
     $scope.buildings = []; //array of buildings
@@ -198,9 +192,9 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
         });
     }
 
-    $scope.getEmpValue = function () {
-        var employeeUserName = $scope.empID;
-    };
+    /*$scope.getEmpValue = function () {
+        var employeeUserName = $scope.emp.userName;
+    };*/
 
     $scope.getBuildings = function () {
         var x = $scope.siteName;
@@ -281,63 +275,56 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
     };
 
     $scope.sendReport = function () {
-        var reason = $scope.SelectesReasonReport;
-        var referance;
-        var changingOwnerReq = {
-            requestOption: "",
-            newEmpID: "",
-            enc: $scope.userEncryptors[tempDataIndex]
+        let emp = $scope.emp;
+        let encObj = JSON.parse(JSON.stringify($scope.userEncryptors[tempDataIndex]));
+        var report = {
+            reportType: "" + $scope.SelectesReasonReport,
+            reportID: "-1",
+            reportOwner: "" + $scope.userEncryptors[tempDataIndex].ownerID,
+            date: null,
+            notifications: "" + (($scope.notification == undefined) ? "" : $scope.notification),
+
+
+            enc: encObj ,
+            reference: null,
+            approvementStatus: false
         };
         
-        empReportArr[1] = $scope.userEncryptors[tempDataIndex].ownerID;
-        empReportArr[2] = null;
-        empReportArr[3] = $scope.userEncryptors[tempDataIndex].serialNumber;
-        switch (reason) {
+        switch (report.reportType) {
             case 'monthly report':
-                empReportArr[0] = "monthly report";
-                empReportArr[4] = "monthly report:  " + (($scope.notification == undefined) ? "" : $scope.notification);
+                // TODO
                 break;
             case 'changing encryptor location':
-                empReportArr[0] = "changing encryptor location";
-                empReportArr[4] = "changing encryptor location:  "
-                empReportArr[5] = $scope.siteName;
-                empReportArr[6] = $scope.buildName;
-                empReportArr[7] = $scope.floorNumber;
-                empReportArr[8] = $scope.room;
+                report.enc.deviceLocation = settingNewLocation(report.enc.deviceLocation);
                 break;
             case 'changing encryptor status':
-                //empReportArr[0] = "changing encryptor status";
-                changingOwnerReq.requestOption = $scope.SelectesReasonReport;
-                changingOwnerReq.enc.status = $scope.encStatus;
-                $http({
-                    method: "POST",
-                    data: JSON.stringify({ 'empReport': changingOwnerReq }),
-                    //data: changingOwnerReq,
-                    url: "testReport"
-                }).then(function (dataReturn) {
-                    if (dataReturn.data = "sql success") alert("Report send successfully");
-                    else alert("something go wrong, please try to send again");
-                    cleanReport();
-                }); 
+                report.enc.status = "" + $scope.encStatus;
+                //TODO - finding solution to send file 
                 break;
             case 'deliver to employee':
-                //empReportArr[0] = "changing encryptor status";
-                //new owner report
-                
-                 
+                report.enc.ownerID = "" + emp.userName;
+                report.enc.deviceLocation = settingNewLocation(report.enc.deviceLocation);
                 break;
         }
         $http({
             method: "POST",
-            data: empReportArr,
-            url: "sendReport"
+            data: JSON.stringify({ 'empReport': report }),
+            url: "SendReport"
         }).then(function (dataReturn) {
             if (dataReturn.data = "sql success") alert("Report send successfully");
             else alert("something go wrong, please try to send again");
-            cleanReport();   
-        });  
+            cleanReport();
+        }); 
     };
 
+
+    function settingNewLocation(deviceLocation) {
+        deviceLocation.facility = "" + $scope.siteName;
+        deviceLocation.building = "" + $scope.buildName;
+        deviceLocation.floor = "" + $scope.floorNumber;
+        deviceLocation.room =  "" + $scope.room;
+        return deviceLocation;
+    }
     /*      map view page , second page for employee        */
     $scope.searchResults = function () {
         //continue with searching ! 

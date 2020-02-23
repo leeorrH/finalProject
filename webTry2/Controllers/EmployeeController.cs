@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Net.Http;
 using System.Web.Mvc;
 using webTry2.Controllers;
 using webTry2.Models;
@@ -145,16 +146,14 @@ namespace WEB_project.Controllers
         }
 
         [HttpPost]
-        public ActionResult SendReport(List<string> empReport)
+        public ActionResult SendReport(EmpReport empReport)
         {
-            DateTime dateTime = DateTime.Now;
-            string sqlFormattedDate = dateTime.ToString("yyyy-MM-dd HH:mm:ss.fff");
-            empReport[2] = sqlFormattedDate;
+            
             //employeeReportSubController need to be remove as a reference to encryptorSubController
             EmployeeReportSubController empRepCtrl = new EmployeeReportSubController();
             try
             {
-                switch (empReport[0])
+                switch (empReport.reportType)
                 {
                     case "monthly report":
                         empRepCtrl.SendMonthlyReport(empReport);
@@ -166,7 +165,7 @@ namespace WEB_project.Controllers
 
                         break;
                     case "deliver to employee":
-
+                        empRepCtrl.deliverToEmpRepord(empReport);
                         break;
 
                     default:
@@ -183,15 +182,7 @@ namespace WEB_project.Controllers
             return Json("sql success", JsonRequestBehavior.AllowGet);
 
         }
-
-        [HttpPost]
-        public string testReport(ChangingOwnerReq empReport)
-        {
-            Console.WriteLine(empReport.ToString());
-            return "sql success";
-        }
     }
-
 
 }
 
