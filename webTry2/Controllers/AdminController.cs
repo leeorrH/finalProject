@@ -71,6 +71,9 @@ namespace webTry2.Controllers
             closeConnectionAndReading();
             return Json(userEncryptors, JsonRequestBehavior.AllowGet);
         }
+
+        
+       
     }
 
 }

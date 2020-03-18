@@ -6,10 +6,10 @@
  * 
  */
 
-var app = angular.module("adminApp", []);
-app.controller("adminPageContoller", function ($scope, $http, $location) {
+var app = angular.module("adminApp", ['commonMod']);
+app.controller("adminPageContoller", ['$scope', '$location','$http','commonFunctions', function ($scope,$location,$http,commonFunctions) {
 
-    var postData = $location.$$absUrl.split("?");
+    var postData = $location.absUrl().split("?");
     $scope.userName = postData[1].split("=");
     $scope.userName = $scope.userName[1];
 
@@ -25,13 +25,7 @@ app.controller("adminPageContoller", function ($scope, $http, $location) {
     $scope.statusArray = []; // need to have all posible status
     $scope.sitesLocationsArray = []; // have all locations buildings and coordinates
     //user basic deatails
-    $scope.UserObj = {
-        "UserName": "",
-        "firstName": "",
-        "lastName": "",
-        "email": "",
-        "phoneNumber": ""
-    };
+    var userDetails;
 
     //variables for showing data on edit window
     $scope.tempDataForEditWindow;
@@ -46,8 +40,8 @@ app.controller("adminPageContoller", function ($scope, $http, $location) {
     /* on load - getting all encryptors
      * also get user details
      */
-    $scope.onLoad = function () {
-
+    $scope.onLoad = function () { //see on employee.js impementation
+        userDetails = commonFunctions.getUserDetails($scope.userName);
         //getting all encryptors
         $http({
             method: "POST",
@@ -97,10 +91,10 @@ app.controller("adminPageContoller", function ($scope, $http, $location) {
 
     /*      map view page , second page for employee        */
     $scope.searchResults = function () {
-        //continue with searching ! 
-        var searchIn = $('#searchInput').val(); 
-        var result = $scope.Encryptors.includes(searchIn);
-        Console.log(result);
+        //continue with searching !
+        //var searchIn = $('#searchInput').val(); 
+        //var result = $scope.Encryptors.includes(searchIn);
+        //Console.log(result);
     }
 
     $scope.initialize = function () {
@@ -162,4 +156,4 @@ app.controller("adminPageContoller", function ($scope, $http, $location) {
     }
 
 
-});
+}]);

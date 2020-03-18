@@ -42,7 +42,7 @@ namespace webTry2.Controllers
 
 
                 temp.status = dataReader.GetValue(2).ToString();
-                temp.ownerID = userName;
+                temp.ownerID = userName; //need to set as User class ! TBD
 
                 //adding data to location
                 loc.locationID = Int16.Parse(dataReader.GetValue(3).ToString());

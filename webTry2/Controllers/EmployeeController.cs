@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Net.Http;
 using System.Web.Mvc;
 using webTry2.Controllers;
 using webTry2.Models;
@@ -11,7 +10,9 @@ namespace WEB_project.Controllers
 {
     public class EmployeeController : DBController
     {
+        private EmployeeReportSubController empRepCtrl = new EmployeeReportSubController();
 
+        public Dictionary<string,User> users = new Dictionary<string, User>();
 
         // GET: Employee
         public ActionResult employeePage()
@@ -29,7 +30,7 @@ namespace WEB_project.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
-        [HttpPost]
+        [HttpPost] //move to DB controller
         public ActionResult getEmployeeList(string empUserName)
         {
             List<User> employees = new List<User>();
@@ -60,7 +61,7 @@ namespace WEB_project.Controllers
             return Json(employees, JsonRequestBehavior.AllowGet);
         }
 
-        [HttpPost]
+        [HttpPost]//move to DB controller
         public ActionResult getBuildingList(string siteName)
         {
             List<string> buildings = new List<string>();
@@ -89,7 +90,7 @@ namespace WEB_project.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost]//move to DB controller
         public ActionResult getfloorsList(string siteName,string buildName)
         {
             List<string> floors = new List<string>();
@@ -117,7 +118,7 @@ namespace WEB_project.Controllers
             return Json(floors, JsonRequestBehavior.AllowGet);
         }
 
-        [HttpPost]
+        [HttpPost] //move to DB controller
         public ActionResult getRoomList(string siteName, string buildName, string floorNumber)
         {
             List<string> rooms = new List<string>();
@@ -148,9 +149,6 @@ namespace WEB_project.Controllers
         [HttpPost]
         public ActionResult SendReport(EmpReport empReport)
         {
-            
-            //employeeReportSubController need to be remove as a reference to encryptorSubController
-            EmployeeReportSubController empRepCtrl = new EmployeeReportSubController();
             try
             {
                 switch (empReport.reportType)
@@ -162,10 +160,10 @@ namespace WEB_project.Controllers
                         empRepCtrl.ChangingEncLocationReport(empReport);
                         break;
                     case "changing encryptor status":
-
+                        empRepCtrl.changingStatus(empReport);
                         break;
                     case "deliver to employee":
-                        empRepCtrl.deliverToEmpRepord(empReport);
+                        empRepCtrl.DeliverToEmpRepord(empReport);
                         break;
 
                     default:
@@ -181,6 +179,59 @@ namespace WEB_project.Controllers
             }
             return Json("sql success", JsonRequestBehavior.AllowGet);
 
+        }
+
+        [HttpPost]
+        public ActionResult getUserDetails(string userName)
+        {
+            bool dataReaderFlag = false;
+            User user;
+            if (users.TryGetValue(userName,out user))
+            {
+                dataReaderFlag = true;
+            }
+            else
+            {
+                user = new User();
+
+                connectToSQL();
+
+                sqlQuery = "select *" +
+                    " from Users" +
+                    " where Users.userName = '" + userName + "'";
+
+                SqlDataReader result = sendSqlQuery(sqlQuery);
+                while (result.Read())
+                {
+                    dataReaderFlag = true;
+                    user.userName = dataReader.GetValue(0).ToString();
+                    user.firstName = dataReader.GetValue(2).ToString();
+                    user.lastName = dataReader.GetValue(3).ToString();
+                    user.email = dataReader.GetValue(4).ToString();
+                    user.phoneNumber = dataReader.GetValue(5).ToString();
+                    user.permission = dataReader.GetValue(6).ToString();
+                    user.unit = dataReader.GetValue(7).ToString();
+                }
+
+                users.Add(userName, user);
+            }
+            
+            if (dataReaderFlag == false)
+            {
+                return Json(null, JsonRequestBehavior.AllowGet);
+            }
+            return Json(user, JsonRequestBehavior.AllowGet);
+
+        }
+
+        [HttpPost]
+        public ActionResult getRequests(string userName , string permission)
+        {
+            List<EmpReport> res = null;
+            if (permission.Equals("employee")) res = empRepCtrl.GetEmpReports(userName);
+            else res = empRepCtrl.GetAllReports();
+            if(res.Count > 0) return Json(res, JsonRequestBehavior.AllowGet);
+            return Json(null , JsonRequestBehavior.AllowGet);
         }
     }
 

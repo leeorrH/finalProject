@@ -1,8 +1,8 @@
 ﻿
-var app = angular.module("employeeAng", []);
-app.controller("employeePageContoller", function ($scope, $http, $location, $timeout) {
+var app = angular.module("employeeAng", ['commonMod']);
+app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeout', 'commonFunctions', function ($scope, $location, $http, $timeout, commonFunctions) {
 
-    var postData = $location.$$absUrl.split("?");
+    var postData = $location.absUrl().split("?");
     $scope.userName = postData[1].split("=");
     $scope.userName = $scope.userName[1];
 
@@ -19,18 +19,12 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
      * set Markers on map function: setMarkersOnMap
      */
     $scope.userEncryptors = [];
+    $scope.userReports = [];
     var markesrArray = [];
     $scope.gMap;
 
     //user basic deatails
-    $scope.UserObj = {
-        "UserName": "",
-        "firstName": "",
-        "lastName": "",
-        "email": "",
-        "phoneNumber": ""
-    };
-
+    var userDetails;
     
 
     //for EDIT window
@@ -51,10 +45,27 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
     /* on load - getting all user encryptors by his user number - userName
      * also get user details */
     $scope.onLoad = function () {
+        if (localStorage.length == 0) {
+            localStorage.setItem($scope.userName , $scope.userName);
+        }
+        else if (!localStorage.getItem($scope.userName)) {
+            localStorage.setItem($scope.userName, $scope.userName);
+        }
+        //getting user details  
+        commonFunctions.getUserDetails(localStorage.getItem($scope.userName)).then(function (dataReturn) {
+            if (dataReturn.data) {
+                userDetails = dataReturn.data;
+                getUserEncryptors();
+            }
+        });
+        
+    };
+
+    function getUserEncryptors() {
         //getting encryptors
         $http({
             method: "POST",
-            data: { "userName": $scope.userName },
+            data: { "userName": userDetails.userName },
             //url define what function we apply to when post to the server
             //url: "loadEmployeeEncryptors"
             url: "loadEmployeeEncryptors"
@@ -64,13 +75,11 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
             $.each(data, function (index, record) {
                 $scope.userEncryptors.push(record);
             });
-             //loading map object
+            //loading map object
             $scope.initialize();
-           
-           // $('selectStatus option[value=' + $scope.userEncryptors + "']").attr("selected", "selected");
+            // $('selectStatus option[value=' + $scope.userEncryptors + "']").attr("selected", "selected");
         });
-        //getting user details  
-    };
+    }
 
     //function for display and update 
     $scope.getRowData = function (index) {
@@ -299,6 +308,8 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
                 break;
             case 'changing encryptor status':
                 report.enc.status = "" + $scope.encStatus;
+
+
                 //TODO - finding solution to send file 
                 break;
             case 'deliver to employee':
@@ -325,12 +336,15 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
         deviceLocation.room =  "" + $scope.room;
         return deviceLocation;
     }
+
+
     /*      map view page , second page for employee        */
     $scope.searchResults = function () {
-        //continue with searching ! 
-        var searchIn = $('#searchInput').val();
-        var result = $scope.userEncryptors.includes(searchIn);
-        Console.log(result);
+        //continue with searching !
+        
+        //var searchIn = $('#searchInput').val();
+        //var result = $scope.userEncryptors.includes(searchIn);
+        //console.log(result);
     };
 
     $scope.initialize = function () {
@@ -354,14 +368,41 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
      * also push markers to markesrArray */
     function initMarkers() {
         angular.forEach($scope.userEncryptors, function (encryptor, index) {
+            var contentString = generateContent(encryptor);
             var marker = new google.maps.Marker({
                 //setting marker position
                 position: new google.maps.LatLng(encryptor.deviceLocation.latitude, encryptor.deviceLocation.longitude),
-                map: $scope.gMap
+                map: $scope.gMap,
             });
-            markesrArray.push(marker);
+            k = markesrArray.push(marker);
+
+            var infowindow = new google.maps.InfoWindow({
+                content: contentString
+            });
+
+            markesrArray[k - 1].addListener('click', function () {
+                infowindow.open($scope.gMap, marker);
+            });
         });
     };
+
+    function generateContent(encryptor) {
+        var content =
+            '<div id="content">' +
+            '<h4> Encryptor details: </h4>' +
+            '<ul>' +
+            '<li> <b>Encryptor SN:</b> ' + encryptor.serialNumber + '</il>' +
+            '<li> <b>Time stamp:</b> ' + encryptor.timestamp + '</il>' +
+            '<li> <b>Owner:</b> ' + encryptor.ownerID + '- ' + userDetails.firstName + ' ' + userDetails.lastName + '</il> ' +
+            '<li> <b>Status:</b> ' + encryptor.status + '</il>' +
+            '<li> <b>Facility:</b> ' + encryptor.deviceLocation.facility + '</il>' +
+            '<li> <b>Building:</b> ' + encryptor.deviceLocation.building + '</il>' +
+            '<li> <b>Floor:</b> ' + encryptor.deviceLocation.floor + '</il>' +
+            '<li> <b>Room:</b> ' + encryptor.deviceLocation.room + '</il>' +
+            '</ul>' +
+            '</div>';
+        return content;
+    }
 
     /* introduction: clusterMarkers function cluster marker by their location 
        markerClusterer on google */
@@ -370,7 +411,7 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
             { imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' });
     };
 
-});
+}]);
 
 
 /*
