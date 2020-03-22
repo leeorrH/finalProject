@@ -112,16 +112,8 @@ namespace webTry2.Controllers
         //orit
         public void changingStatus(EmpReport empReport)
         {
-            // string filePath = "";
-            // string connectionString = "";
-            FileStream stream = new FileStream(empReport.reference, FileMode.Open, FileAccess.Read);
-            BinaryReader reader = new BinaryReader(stream);
-            byte[] file = reader.ReadBytes((int)stream.Length);
-            reader.Close();
-            stream.Close();
-
             sqlQuery = "INSERT INTO dbo.EmployeeReport (reportType,reportOwner, date,encSN, ownerID,encStatus,location,notifications,reference,approvementStatus)" +
-                     " VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateToString(empReport) + "', '" + empReport.enc.serialNumber + "', NULL, NULL, NULL,'" + empReport.notifications + "', NULL, 'false'); ";
+                     " VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateToString(empReport) + "', '" + empReport.enc.serialNumber + "', NULL, NULL, NULL,'" + empReport.notifications + "','"+empReport.reference+"', 'false'); ";
             var res = sqlIUDoperation(sqlQuery);
             if (res == 0)
             {

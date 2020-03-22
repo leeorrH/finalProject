@@ -298,6 +298,7 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
             reference: null,
             approvementStatus: false
         };
+        let statusCaseFlag = false;
         
         switch (report.reportType) {
             case 'monthly report':
@@ -307,16 +308,34 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
                 report.enc.deviceLocation = settingNewLocation(report.enc.deviceLocation);
                 break;
             case 'changing encryptor status':
+                statusCaseFlag = true;
                 report.enc.status = "" + $scope.encStatus;
 
-
-                //TODO - finding solution to send file 
+                var filerReader = new FileReader();
+                filerReader.onload = function (event) {
+                    var res = event.target.result.split("base64,")[1];
+                    report.reference = res;
+                    postReport(report); 
+                }
+                var fileList = document.getElementById('refFile').files;
+                filerReader.readAsDataURL(fileList[0]);
+                
                 break;
             case 'deliver to employee':
                 report.enc.ownerID = "" + emp.userName;
                 report.enc.deviceLocation = settingNewLocation(report.enc.deviceLocation);
                 break;
         }
+        if (statusCaseFlag == true) {
+            statusCaseFlag = false;
+        } else {
+            postReport(report);
+        }
+        
+       
+    };
+
+    function postReport(report) {
         $http({
             method: "POST",
             data: JSON.stringify({ 'empReport': report }),
@@ -326,8 +345,12 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
             else alert("something go wrong, please try to send again");
             cleanReport();
         }); 
-    };
+    }
 
+    function addFile() {
+       
+    
+    };
 
     function settingNewLocation(deviceLocation) {
         deviceLocation.facility = "" + $scope.siteName;
@@ -350,6 +373,7 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
     $scope.initialize = function () {
         var googleMapOption = {
             zoom: 6.99,
+            maxZoom:18,
             center: new google.maps.LatLng(32.3571742, 36.9767603),
             mapTypeId: google.maps.MapTypeId.TERRAIN,
             mapTypeControl: true,
@@ -373,6 +397,7 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
                 //setting marker position
                 position: new google.maps.LatLng(encryptor.deviceLocation.latitude, encryptor.deviceLocation.longitude),
                 map: $scope.gMap,
+                _details: encryptor
             });
             k = markesrArray.push(marker);
 
@@ -388,8 +413,8 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
 
     function generateContent(encryptor) {
         var content =
-            '<div id="content">' +
-            '<h4> Encryptor details: </h4>' +
+            '<div id="content" style="margin-left:5px">' +
+            '<h4 style="margin-left:5px" > Encryptor details: </h4>' +
             '<ul>' +
             '<li> <b>Encryptor SN:</b> ' + encryptor.serialNumber + '</il>' +
             '<li> <b>Time stamp:</b> ' + encryptor.timestamp + '</il>' +
@@ -407,8 +432,36 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
     /* introduction: clusterMarkers function cluster marker by their location 
        markerClusterer on google */
     function clusterMarkers() {
-        var markerCluster = new MarkerClusterer($scope.gMap, markesrArray,
-            { imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' });
+        var options_markerclusterer = {
+            gridSize: 20,
+            maxZoom: 18,
+            zoomOnClick: false,
+            imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
+        };
+
+        var markerCluster = new MarkerClusterer($scope.gMap, markesrArray, options_markerclusterer);
+
+        google.maps.event.addListener(markerCluster, 'clusterclick', function (cluster) {
+
+            var markers = cluster.getMarkers();
+            var infoWindow = new google.maps.InfoWindow();
+            var array = [];
+            var num = 0;
+
+            for (i = 0; i < markers.length; i++) {
+
+                num++;
+                array.push(markers[i]._details.serialNumber + '<br>');
+            }
+
+
+            if ($scope.gMap.getZoom() == markerCluster.getMaxZoom()) {
+                infoWindow.setContent(markers.length + " markers<br>" + array);
+                infoWindow.setPosition(cluster.getCenter());
+                infoWindow.open($scope.gMap);
+            }
+        });
+
     };
 
 }]);

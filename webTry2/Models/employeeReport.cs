@@ -8,7 +8,7 @@ namespace webTry2.Models
     public class employeeReport : ReportAbstract
     {
         public string encryptorID { get; set; }
-        public byte[] reference { get; set; }
+        public string reference { get; set; }
         public bool approvementStatus { get; set; }
         public string encNewStatus { get; set; }
 
