@@ -150,6 +150,7 @@
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\DBController.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
+    <Compile Include="Controllers\EmployeeReportSubController.cs" />
     <Compile Include="Controllers\encryptorSubController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
@@ -160,6 +161,7 @@
     <Compile Include="Models\generalReport.cs" />
     <Compile Include="Models\Location.cs" />
     <Compile Include="Models\ReportAbstract.cs" />
+    <Compile Include="Models\requests\EmpReport.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -173,31 +175,32 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\AdminPageScripts\admin_app.js" />
-    <Content Include="Scripts\angular-mocks.js" />
-    <Content Include="Scripts\angular.js" />
-    <Content Include="Scripts\angular.min.js" />
-    <Content Include="Scripts\bootstrap.js" />
-    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\common\common.js" />
+    <Content Include="Scripts\injections\angular-mocks.js" />
+    <Content Include="Scripts\injections\angular.js" />
+    <Content Include="Scripts\injections\angular.min.js" />
+    <Content Include="Scripts\injections\bootstrap.js" />
+    <Content Include="Scripts\injections\bootstrap.min.js" />
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\angular.min.js.map" />
-    <None Include="Scripts\jquery-3.3.1.intellisense.js" />
+    <Content Include="Scripts\injections\angular.min.js.map" />
+    <None Include="Scripts\injections\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\employeePageScripts\employeeTableStyle.css" />
     <Content Include="Scripts\employeePageScripts\employee_app.js" />
     <Content Include="Scripts\employeePageScripts\mapViewPageStyle.css" />
     <Content Include="Scripts\login_register_scripts\login_register_app.js" />
-    <Content Include="Scripts\jquery-3.3.1.js" />
-    <Content Include="Scripts\jquery-3.3.1.min.js" />
-    <Content Include="Scripts\jquery-3.3.1.slim.js" />
-    <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
-    <None Include="Scripts\jquery.validate-vsdoc.js" />
-    <Content Include="Scripts\jquery.validate.js" />
-    <Content Include="Scripts\jquery.validate.min.js" />
-    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\injections\jquery-3.3.1.js" />
+    <Content Include="Scripts\injections\jquery-3.3.1.min.js" />
+    <Content Include="Scripts\injections\jquery-3.3.1.slim.js" />
+    <Content Include="Scripts\injections\jquery-3.3.1.slim.min.js" />
+    <None Include="Scripts\injections\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\injections\jquery.validate.js" />
+    <Content Include="Scripts\injections\jquery.validate.min.js" />
+    <Content Include="Scripts\injections\jquery.validate.unobtrusive.js" />
+    <Content Include="Scripts\injections\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\mapScript\Map_app.js" />
-    <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\injections\modernizr-2.8.3.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -227,8 +230,8 @@
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <None Include="packages.config" />
-    <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
-    <Content Include="Scripts\jquery-3.3.1.min.map" />
+    <Content Include="Scripts\injections\jquery-3.3.1.slim.min.map" />
+    <Content Include="Scripts\injections\jquery-3.3.1.min.map" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

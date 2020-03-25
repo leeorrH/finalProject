@@ -1,8 +1,8 @@
 ﻿
-var app = angular.module("employeeAng", []);
-app.controller("employeePageContoller", function ($scope, $http, $location, $timeout) {
+var app = angular.module("employeeAng", ['commonMod']);
+app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeout', 'commonFunctions', function ($scope, $location, $http, $timeout, commonFunctions) {
 
-    var postData = $location.$$absUrl.split("?");
+    var postData = $location.absUrl().split("?");
     $scope.userName = postData[1].split("=");
     $scope.userName = $scope.userName[1];
 
@@ -19,49 +19,13 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
      * set Markers on map function: setMarkersOnMap
      */
     $scope.userEncryptors = [];
+    $scope.userReports = [];
     var markesrArray = [];
     $scope.gMap;
 
     //user basic deatails
-    $scope.UserObj = {
-        "UserName": "",
-        "firstName": "",
-        "lastName": "",
-        "email": "",
-        "phoneNumber": ""
-    };
-    //employee report basic deatails
-    var empReport = {
-        reportID: "",
-        reportOwner: "",
-        date: "",
-        notifications: "",
-        encryptor: "",
-        reference: "",
-        approvementStatus: ""
-    };
-    //encryptor report basic deatails
- /*   var encryptor = {
-        serialNumber: "",
-        timestamp: {},
-        timestampAsString: "",
-        ownerID: "",
-        status:"",
-        deviceLocation: {}
-    };*/
-
-     //location report basic deatails
-    var location = {
-        locationID:"",
-        facility: "",
-        building:"",
-        floor:"",
-        room: "",
-        latitude: "",
-        longitude: ""
-    }
-    var empReportArr = [];
-
+    var userDetails;
+    
 
     //for EDIT window
     $scope.employees = []; //array of employees
@@ -81,10 +45,39 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
     /* on load - getting all user encryptors by his user number - userName
      * also get user details */
     $scope.onLoad = function () {
+        if (localStorage.length == 0) {
+            localStorage.setItem($scope.userName , $scope.userName);
+        }
+        else if (!localStorage.getItem($scope.userName)) {
+            localStorage.setItem($scope.userName, $scope.userName);
+        }
+        //getting user details  
+        commonFunctions.getUserDetails(localStorage.getItem($scope.userName)).then(function (dataReturn) {
+            if (dataReturn.data) {
+                userDetails = dataReturn.data;
+                getUserEncryptors();
+            }
+        });
+    };
+
+    $scope.getReports = function () {
+        //getting user reports
+        commonFunctions.getReports(userDetails.userName, userDetails.permission).then(function (dataReturn) {
+            var reports = dataReturn.data;
+            if (reports) {
+                $.each(reports, function (index, report) {
+                    $scope.userReports.push(report);
+                });
+                console.log($scope.userReports);
+            }
+        });
+    };
+
+    function getUserEncryptors() {
         //getting encryptors
         $http({
             method: "POST",
-            data: { "userName": $scope.userName },
+            data: { "userName": userDetails.userName },
             //url define what function we apply to when post to the server
             //url: "loadEmployeeEncryptors"
             url: "loadEmployeeEncryptors"
@@ -94,12 +87,11 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
             $.each(data, function (index, record) {
                 $scope.userEncryptors.push(record);
             });
-             //loading map object
-            $scope.initialize(); 
-           // $('selectStatus option[value=' + $scope.userEncryptors + "']").attr("selected", "selected");
+            //loading map object
+            initializeMap();
+            // $('selectStatus option[value=' + $scope.userEncryptors + "']").attr("selected", "selected");
         });
-        //getting user details  
-    };
+    }
 
     //function for display and update 
     $scope.getRowData = function (index) {
@@ -131,6 +123,10 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
 
     //report functions:
     $scope.cleanReport = function () {
+        cleanReport();
+    };
+
+    function cleanReport(){
         $('.selectpicker').selectpicker();
         $('.selectpicker').selectpicker('val', '');
         $('.selectpicker[reference="toReset"]').html('');
@@ -148,7 +144,10 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
         $scope.buildName = "";
         $scope.floorNumber = "";
         $scope.room = "";
-    };
+
+        $scope.notification = "";
+    }
+
     $scope.ReportAbout = function (reportReason) {
         var reason = $scope.SelectesReasonReport;
         switch (reason) {
@@ -182,7 +181,6 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
                 $scope.employees = []; 
                 getAllEmployees();
                 break;
-                
         }
     };
 
@@ -215,9 +213,9 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
         });
     }
 
-    $scope.getEmpValue = function () {
-        var employeeUserName = $scope.empID;
-    };
+    /*$scope.getEmpValue = function () {
+        var employeeUserName = $scope.emp.userName;
+    };*/
 
     $scope.getBuildings = function () {
         var x = $scope.siteName;
@@ -298,59 +296,90 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
     };
 
     $scope.sendReport = function () {
-        var reason = $scope.SelectesReasonReport;
-        var referance;
-        var newStatus;
-        switch (reason) {
+        let emp = $scope.emp;
+        let encObj = JSON.parse(JSON.stringify($scope.userEncryptors[tempDataIndex]));
+        var report = {
+            reportType: "" + $scope.SelectesReasonReport,
+            reportID: "-1",
+            reportOwner: "" + $scope.userEncryptors[tempDataIndex].ownerID,
+            date: null,
+            notifications: "" + (($scope.notification == undefined) ? "" : $scope.notification),
+            enc: encObj ,
+            reference: null,
+            approvementStatus: false
+        };
+        let statusCaseFlag = false;
+        
+        switch (report.reportType) {
             case 'monthly report':
-                
-                $http({
-                    method: "POST",
-                    data: {
-                        ["reportOwner": $scope.userEncryptors[tempDataIndex].ownerID,
-                        "ENserialNumber": $scope.userEncryptors[tempDataIndex].serialNumber,
-                        "status": $scope.userEncryptors[tempDataIndex].status,
-                        "deviceLocationID": $scope.userEncryptors[tempDataIndex].deviceLocation.locationID]
-                    },
-                    url: "sendMonthlyReport"
-                });
+                // TODO
                 break;
             case 'changing encryptor location':
-             /*   var x= $scope.approveInUse;
-                $scope.locationDetails = false;
-                $scope.deliverToEmpDetails = true;
-                $scope.attachReference = true;
-                $scope.EncChangeStatus = true;*/
+                report.enc.deviceLocation = settingNewLocation(report.enc.deviceLocation);
                 break;
             case 'changing encryptor status':
-            /*    referance=$scope.attachReference;
-                newStatus=$scope.EncChangeStatus;
-                reason = $scope.ReasonToUpdate;
-                new employeeReport(referance);*/
+                statusCaseFlag = true;
+                report.enc.status = "" + $scope.encStatus;
+
+                var filerReader = new FileReader();
+                filerReader.onload = function (event) {
+                    var res = event.target.result;
+                    report.reference = res;
+                    postReport(report); 
+                }
+                var fileList = document.getElementById('refFile').files;
+                filerReader.readAsDataURL(fileList[0]);
+                
                 break;
             case 'deliver to employee':
-              /*  $scope.approveInUse = true;
-                $scope.locationDetails = false;
-                $scope.deliverToEmpDetails = false;
-                $scope.attachReference = true;
-                $scope.EncChangeStatus = true;
-                $scope.employees = [];
-                getAllEmployees();*/
+                report.enc.ownerID = "" + emp.userName;
+                report.enc.deviceLocation = settingNewLocation(report.enc.deviceLocation);
                 break;
         }
+        if (statusCaseFlag == true) {
+            statusCaseFlag = false;
+        } else {
+            postReport(report);
+        }
+        
+       
     };
+
+    function postReport(report) {
+        $http({
+            method: "POST",
+            data: JSON.stringify({ 'empReport': report }),
+            url: "SendReport"
+        }).then(function (dataReturn) {
+            if (dataReturn.data = "sql success") alert("Report send successfully");
+            else alert("something go wrong, please try to send again");
+            cleanReport();
+        }); 
+    }
+
+
+    function settingNewLocation(deviceLocation) {
+        deviceLocation.facility = "" + $scope.siteName;
+        deviceLocation.building = "" + $scope.buildName;
+        deviceLocation.floor = "" + $scope.floorNumber;
+        deviceLocation.room =  "" + $scope.room;
+        return deviceLocation;
+    }
+
 
     /*      map view page , second page for employee        */
     $scope.searchResults = function () {
-        //continue with searching ! 
-        var searchIn = $('#searchInput').val();
-        var result = $scope.userEncryptors.includes(searchIn);
-        Console.log(result);
+        //continue with searching !
+        
+        //var searchIn = $('#searchInput').val();
+        //var result = $scope.userEncryptors.includes(searchIn);
+        //console.log(result);
     };
 
-    $scope.initialize = function () {
+    function initializeMap() {
         var googleMapOption = {
             zoom: 6.99,
+            maxZoom:18,
             center: new google.maps.LatLng(32.3571742, 36.9767603),
             mapTypeId: google.maps.MapTypeId.TERRAIN,
             mapTypeControl: true,
@@ -369,23 +398,81 @@ app.controller("employeePageContoller", function ($scope, $http, $location, $tim
      * also push markers to markesrArray */
     function initMarkers() {
         angular.forEach($scope.userEncryptors, function (encryptor, index) {
+            var contentString = generateContent(encryptor);
             var marker = new google.maps.Marker({
                 //setting marker position
                 position: new google.maps.LatLng(encryptor.deviceLocation.latitude, encryptor.deviceLocation.longitude),
-                map: $scope.gMap
+                map: $scope.gMap,
+                _details: encryptor
             });
-            markesrArray.push(marker);
+            k = markesrArray.push(marker);
+
+            var infowindow = new google.maps.InfoWindow({
+                content: contentString
+            });
+
+            markesrArray[k - 1].addListener('click', function () {
+                infowindow.open($scope.gMap, marker);
+            });
         });
     };
+
+    function generateContent(encryptor) {
+        var content =
+            '<div id="content" style="margin-left:5px">' +
+            '<h4 style="margin-left:5px" > Encryptor details: </h4>' +
+            '<ul>' +
+            '<li> <b>Encryptor SN:</b> ' + encryptor.serialNumber + '</il>' +
+            '<li> <b>Time stamp:</b> ' + encryptor.timestamp + '</il>' +
+            '<li> <b>Owner:</b> ' + encryptor.ownerID + '- ' + userDetails.firstName + ' ' + userDetails.lastName + '</il> ' +
+            '<li> <b>Status:</b> ' + encryptor.status + '</il>' +
+            '<li> <b>Facility:</b> ' + encryptor.deviceLocation.facility + '</il>' +
+            '<li> <b>Building:</b> ' + encryptor.deviceLocation.building + '</il>' +
+            '<li> <b>Floor:</b> ' + encryptor.deviceLocation.floor + '</il>' +
+            '<li> <b>Room:</b> ' + encryptor.deviceLocation.room + '</il>' +
+            '</ul>' +
+            '</div>';
+        return content;
+    }
 
     /* introduction: clusterMarkers function cluster marker by their location 
        markerClusterer on google */
     function clusterMarkers() {
-        var markerCluster = new MarkerClusterer($scope.gMap, markesrArray,
-            { imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' });
+        var options_markerclusterer = {
+            gridSize: 20,
+            maxZoom: 18,
+            zoomOnClick: false,
+            imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
+        };
+
+        var markerCluster = new MarkerClusterer($scope.gMap, markesrArray, options_markerclusterer);
+
+        google.maps.event.addListener(markerCluster, 'clusterclick', function (cluster) {
+
+            var markers = cluster.getMarkers();
+            var infoWindow = new google.maps.InfoWindow();
+            var array = [];
+            var num = 0;
+
+            for (i = 0; i < markers.length; i++) {
+
+                num++;
+                array.push(generateContent(markers[i]._details) + '<br>');
+            }
+
+
+            if ($scope.gMap.getZoom() > 15) { // optional: $scope.gMap.getZoom() == markerCluster.getMaxZoom()
+                infoWindow.setContent(
+                    '<div style="margin-left: 10px">' + 
+                    "<h3>" + markers.length + " markers: <h3> <br>" + array);
+                infoWindow.setPosition(cluster.getCenter());
+                infoWindow.open($scope.gMap);
+            }
+        });
+
     };
 
-});
+}]);
 
 
 /*
