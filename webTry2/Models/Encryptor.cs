@@ -15,7 +15,8 @@ namespace webTry2.Models
         public Location deviceLocation { get; set; }
 
         public Encryptor(){
-        
+
+            deviceLocation = new Location();
 
         }
     }

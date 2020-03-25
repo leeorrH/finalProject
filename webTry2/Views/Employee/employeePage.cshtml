@@ -59,9 +59,12 @@
                                                               $('#empRequestPage').hide(); ">Encryptor mapping</a>
                 </li>
                 <li>
-                <a style="cursor:pointer" onclick="$('#empRequestPage').show();
-                            $('#encryptorManagmentPage').hide();
-                            $('#encryptorMappingPage').hide();">Report Requests</a>
+                <a style="cursor:pointer" ng-click="$('#empRequestPage').show();
+                                                    $('#encryptorManagmentPage').hide();
+                                                    $('#encryptorMappingPage').hide();
+                                                    getReports();">
+                    Report Requests
+                </a>
                 </li>
             </ul>
             <button type="button" style="float:right" class="btn btn-primary navbar-btn" ng-click="logout()">Logout</button>
@@ -339,20 +342,18 @@
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th><input type="text" ng-model="searchtxt.serialNumber" class="form-control" placeholder="Serial number"></th>
-                            <th><input type="text" ng-model="searchtxt.timestampAsString" class="form-control" placeholder="Time Stamp"></th>
-                            <th><input type="text" ng-model="searchtxt.deviceLocation.facility" class="form-control" placeholder="Facility"></th>
-                            <th><input type="text" ng-model="searchtxt.deviceLocation.building" class="form-control" placeholder="Building"></th>
-                            <th><input type="text" ng-model="searchtxt.status" class="form-control" placeholder="Status"></th>
+                            <th><input type="text" ng-model="searchtxt.reportID" class="form-control" placeholder="Serial number"></th>
+                            <th><input type="text" ng-model="searchtxt.reportType" class="form-control" placeholder="Time Stamp"></th>
+                            <th><input type="text" ng-model="searchtxt.reportOwner" class="form-control" placeholder="Facility"></th>
+                            <th><input type="text" ng-model="searchtxt. approvementStatus" class="form-control" placeholder="Status"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="record in userEncryptors | filter : searchtxt">
-                            <td>{{record.serialNumber}}</td>
-                            <td>{{record.timestampAsString}}</td>
-                            <td>{{record.deviceLocation.facility}}</td>
-                            <td>{{record.deviceLocation.building}}</td>
-                            <td>{{record.status}}</td>
+                        <tr ng-repeat="record in userReports | filter : searchtxt">
+                            <td>{{record.reportID}}</td>
+                            <td>{{record.reportType}}</td>
+                            <td>{{record.reportOwner}}</td>
+                            <td>{{record.approvementStatus}}</td>
                             <td>
                                 <a href="#viewEncryptorDataModal" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="View encryptor details" ng-click="getRowData($index)">visibility</i></a>
                                 <a href="#editEncryptorData" class="edit" data-toggle="modal"><i data-toggle="tooltip" title="Edit encryptor details" class="material-icons" ng-click="getRowData($index)">edit</i></a>

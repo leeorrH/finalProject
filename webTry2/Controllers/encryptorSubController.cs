@@ -31,7 +31,6 @@ namespace webTry2.Controllers
             while (dataReader.Read())
             {
                 Encryptor temp = new Encryptor();
-                Location loc = new Location();
 
                 //adding data to Encryptor
                 temp.serialNumber = dataReader.GetValue(0).ToString();
@@ -45,16 +44,14 @@ namespace webTry2.Controllers
                 temp.ownerID = userName; //need to set as User class ! TBD
 
                 //adding data to location
-                loc.locationID = Int16.Parse(dataReader.GetValue(3).ToString());
-                loc.facility = dataReader.GetValue(4).ToString();
-                loc.building = dataReader.GetValue(5).ToString();
-                loc.floor = UInt32.Parse(dataReader.GetValue(6).ToString());
-                loc.room = UInt32.Parse(dataReader.GetValue(7).ToString());
-                loc.longitude = Double.Parse(dataReader.GetValue(8).ToString());
-                loc.latitude = Double.Parse(dataReader.GetValue(9).ToString());
+                temp.deviceLocation.locationID = Int16.Parse(dataReader.GetValue(3).ToString());
+                temp.deviceLocation.facility = dataReader.GetValue(4).ToString();
+                temp.deviceLocation.building = dataReader.GetValue(5).ToString();
+                temp.deviceLocation.floor = UInt32.Parse(dataReader.GetValue(6).ToString());
+                temp.deviceLocation.room = UInt32.Parse(dataReader.GetValue(7).ToString());
+                temp.deviceLocation.longitude = Double.Parse(dataReader.GetValue(8).ToString());
+                temp.deviceLocation.latitude = Double.Parse(dataReader.GetValue(9).ToString());
 
-                //seting location to encryptor
-                temp.deviceLocation = loc;
                 //adding encryptor to user encryptors 
                 userEncryptors.Add(temp);
             }

@@ -58,7 +58,19 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
                 getUserEncryptors();
             }
         });
-        
+    };
+
+    $scope.getReports = function () {
+        //getting user reports
+        commonFunctions.getReports(userDetails.userName, userDetails.permission).then(function (dataReturn) {
+            var reports = dataReturn.data;
+            if (reports) {
+                $.each(reports, function (index, report) {
+                    $scope.userReports.push(report);
+                });
+                console.log($scope.userReports);
+            }
+        });
     };
 
     function getUserEncryptors() {
@@ -76,7 +88,7 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
                 $scope.userEncryptors.push(record);
             });
             //loading map object
-            $scope.initialize();
+            initializeMap();
             // $('selectStatus option[value=' + $scope.userEncryptors + "']").attr("selected", "selected");
         });
     }
@@ -292,8 +304,6 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
             reportOwner: "" + $scope.userEncryptors[tempDataIndex].ownerID,
             date: null,
             notifications: "" + (($scope.notification == undefined) ? "" : $scope.notification),
-
-
             enc: encObj ,
             reference: null,
             approvementStatus: false
@@ -313,7 +323,7 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
 
                 var filerReader = new FileReader();
                 filerReader.onload = function (event) {
-                    var res = event.target.result.split("base64,")[1];
+                    var res = event.target.result;
                     report.reference = res;
                     postReport(report); 
                 }
@@ -347,10 +357,6 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
         }); 
     }
 
-    function addFile() {
-       
-    
-    };
 
     function settingNewLocation(deviceLocation) {
         deviceLocation.facility = "" + $scope.siteName;
@@ -370,7 +376,7 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
         //console.log(result);
     };
 
-    $scope.initialize = function () {
+    function initializeMap() {
         var googleMapOption = {
             zoom: 6.99,
             maxZoom:18,
@@ -451,12 +457,14 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
             for (i = 0; i < markers.length; i++) {
 
                 num++;
-                array.push(markers[i]._details.serialNumber + '<br>');
+                array.push(generateContent(markers[i]._details) + '<br>');
             }
 
 
-            if ($scope.gMap.getZoom() == markerCluster.getMaxZoom()) {
-                infoWindow.setContent(markers.length + " markers<br>" + array);
+            if ($scope.gMap.getZoom() > 15) { // optional: $scope.gMap.getZoom() == markerCluster.getMaxZoom()
+                infoWindow.setContent(
+                    '<div style="margin-left: 10px">' + 
+                    "<h3>" + markers.length + " markers: <h3> <br>" + array);
                 infoWindow.setPosition(cluster.getCenter());
                 infoWindow.open($scope.gMap);
             }

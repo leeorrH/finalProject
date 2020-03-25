@@ -74,7 +74,7 @@ namespace webTry2.Controllers
             sqlQuery = "SELECT * " +
                        "FROM EmployeeReport AS ER " +
                        "WHERE ER.reportOwner = '" + userName + "' " +
-                       "MONTH(ER.date) = MONTH(GETDATE()) " +
+                       "AND MONTH(ER.date) = MONTH(GETDATE()) " +
                        "AND YEAR(ER.date) = YEAR(GETDATE());"; // this query return only reports that relevant to current month
 
             dataReader = sendSqlQuery(sqlQuery);
