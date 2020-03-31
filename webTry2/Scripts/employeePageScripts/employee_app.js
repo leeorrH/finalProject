@@ -55,6 +55,7 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
         commonFunctions.getUserDetails(localStorage.getItem($scope.userName)).then(function (dataReturn) {
             if (dataReturn.data) {
                 userDetails = dataReturn.data;
+                $scope.userDetails = userDetails;
                 getUserEncryptors();
             }
         });
@@ -66,6 +67,7 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
             var reports = dataReturn.data;
             if (reports) {
                 $.each(reports, function (index, report) {
+                    report.approvementStatus = report.approvementStatus == false ? "waiting for approvment" : "approved"; 
                     $scope.userReports.push(report);
                 });
                 console.log($scope.userReports);

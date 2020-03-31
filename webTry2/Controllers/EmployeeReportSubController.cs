@@ -170,16 +170,35 @@ namespace webTry2.Controllers
             while (dataReader.Read())
             {
                 temp = new EmpReport();
-                temp.reportID = Int32.Parse(dataReader.GetValue(0).ToString());
-                temp.reportType = dataReader.GetValue(1).ToString();
-                temp.reportOwner = dataReader.GetValue(2).ToString(); 
-                temp.date = DateTime.Parse(dataReader.GetValue(3).ToString());
-                temp.enc.serialNumber = dataReader.GetValue(4).ToString();
-                temp.enc.ownerID = dataReader.GetValue(5).ToString();
-                temp.enc.status = dataReader.GetValue(6).ToString();
-                temp.enc.deviceLocation.locationID = Int16.Parse(dataReader.GetValue(7).ToString());
-                temp.notifications = dataReader.GetValue(8).ToString();
-                temp.reference = null; // until sending file will be done
+                temp.reportID = Int32.Parse(dataReader.GetValue(0).ToString()); // V
+                temp.reportType = dataReader.GetValue(1).ToString(); // V
+                temp.reportOwner = dataReader.GetValue(2).ToString();  // V
+                temp.date = DateTime.Parse(dataReader.GetValue(3).ToString()); //V
+                temp.enc.serialNumber = dataReader.GetValue(4).ToString(); // V
+
+                switch (temp.reportType)
+                {
+                    case "changing encryptor location":
+                        temp.enc.deviceLocation.locationID = Int16.Parse(dataReader.GetValue(7).ToString());
+                        break;
+
+                    case "deliver to employee":
+                        temp.enc.ownerID = dataReader.GetValue(5).ToString();
+                        temp.enc.deviceLocation.locationID = Int16.Parse(dataReader.GetValue(7).ToString());
+                        break;
+                    case "changing encryptor status":
+                        temp.enc.status = dataReader.GetValue(6).ToString();
+                        temp.reference = null; // until sending file will be done
+                        break;
+                    default:
+                        break;
+                }
+
+                if (!dataReader.GetValue(8).Equals(null))
+                {
+                    temp.notifications = dataReader.GetValue(8).ToString(); // can be null 
+                }
+               
                 temp.approvementStatus = bool.Parse(dataReader.GetValue(10).ToString());
                 reports.Add(temp);
             }

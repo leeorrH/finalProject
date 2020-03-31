@@ -47,7 +47,7 @@
     <nav class="navbar navbar-inverse">
         <div class="container-fluid">
             <div class="navbar-header">
-                <span class="navbar-brand" style="color:antiquewhite"> Hello</span>
+                <span class="navbar-brand" style="color:antiquewhite"> Hello {{userDetails.firstName}} {{userDetails.lastName}}</span>
             </div>
             <ul class="nav navbar-nav">
                 <li><a style="cursor:pointer" onclick="$('#encryptorManagmentPage').show();
@@ -59,10 +59,9 @@
                                                               $('#empRequestPage').hide(); ">Encryptor mapping</a>
                 </li>
                 <li>
-                <a style="cursor:pointer" ng-click="$('#empRequestPage').show();
+                <a style="cursor:pointer" ng-click="getReports();" onclick="$('#empRequestPage').show();
                                                     $('#encryptorManagmentPage').hide();
-                                                    $('#encryptorMappingPage').hide();
-                                                    getReports();">
+                                                    $('#encryptorMappingPage').hide();">
                     Report Requests
                 </a>
                 </li>
@@ -335,17 +334,17 @@
                 <div class="table-title">
                     <div class="row">
                         <div class="col-sm-6">
-                            <h2>Manage my<b> Encryptors</b></h2>
+                            <h2>Manage my<b> Reports</b></h2>
                         </div>
                     </div>
                 </div>
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th><input type="text" ng-model="searchtxt.reportID" class="form-control" placeholder="Serial number"></th>
-                            <th><input type="text" ng-model="searchtxt.reportType" class="form-control" placeholder="Time Stamp"></th>
-                            <th><input type="text" ng-model="searchtxt.reportOwner" class="form-control" placeholder="Facility"></th>
-                            <th><input type="text" ng-model="searchtxt. approvementStatus" class="form-control" placeholder="Status"></th>
+                            <th><input type="text" ng-model="searchtxt.reportID" class="form-control" placeholder="Report id"></th>
+                            <th><input type="text" ng-model="searchtxt.reportType" class="form-control" placeholder="Report type"></th>
+                            <th><input type="text" ng-model="searchtxt.reportOwner" class="form-control" placeholder="Report owner"></th>
+                            <th><input type="text" ng-model="searchtxt. approvementStatus" class="form-control" placeholder="approvment status"></th>
                         </tr>
                     </thead>
                     <tbody>
