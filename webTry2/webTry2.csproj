@@ -151,7 +151,7 @@
     <Compile Include="Controllers\DBController.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
     <Compile Include="Controllers\EmployeeReportSubController.cs" />
-    <Compile Include="Controllers\encryptorSubController.cs" />
+    <Compile Include="Controllers\EncryptorSubController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -170,6 +170,12 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\images\icons8-bookmark-64.png" />
+    <Content Include="Content\images\icons8-map-marker-100.png" />
+    <Content Include="Content\images\icons8-map-pinpoint-64.png" />
+    <Content Include="Content\images\icons8-marker-64.png" />
+    <Content Include="Content\images\icons8-microsoft-excel-2019-96.png" />
+    <Content Include="Content\images\icons8-report-card-40.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />

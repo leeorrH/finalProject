@@ -9,11 +9,19 @@
             });
         },
 
-        getUserDetails : function(userName) {
+        getUserDetails: function(userName) {
             return $http({
                 method: "POST",
                 data: { 'userName': userName },
                 url: "getUserDetails"
+            });
+        },
+
+        getHistory: function (encSN) {
+            return $http({
+                method: "POST",
+                data: { 'encSN': encSN },
+                url: "getEncryptorHistory"
             });
         }
 
