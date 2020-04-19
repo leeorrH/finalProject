@@ -37,6 +37,19 @@ app.controller("adminPageContoller", ['$scope', '$location','$http','commonFunct
 
 
     /*              controller functions                   */
+    $scope.exportEncExl=function() {
+        var x = "hello";
+        //getting all encryptors
+        $http({
+            method: "POST",
+            //url define what function we apply to when post to the server
+            url: "exportEncExl",
+        }).then(function (dataReturn) {
+            var data = dataReturn.data;
+        });
+    };
+
+    
     /* on load - getting all encryptors
      * also get user details
      */

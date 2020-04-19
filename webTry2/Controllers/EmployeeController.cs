@@ -6,6 +6,7 @@ using webTry2.Controllers;
 using webTry2.Models;
 using webTry2.Models.requests;
 
+
 namespace WEB_project.Controllers
 {
     public class EmployeeController : DBController
@@ -15,7 +16,7 @@ namespace WEB_project.Controllers
         private EncryptorSubController encCntrl = new EncryptorSubController();
 
         public Dictionary<string,User> users = new Dictionary<string, User>();
-
+        public List<User> employees;
 
         // GET: Employee
         public ActionResult employeePage()
@@ -32,16 +33,15 @@ namespace WEB_project.Controllers
         }
 
         [HttpPost] //move to DB controller
-        public ActionResult getEmployeeList(string empUserName)
+        public ActionResult getEmployeeList()
         {
-            List<User> employees = new List<User>();
+            employees = new List<User>();
             User temp;
             bool dataReaderFlag = false;
 
             connectToSQL();
             sqlQuery = "select emp.userName, emp.firstName, emp.lastName " +
-                       " from Users as emp " +
-                       " where emp.userName <> '" + empUserName + "'";
+                       " from Users as emp ";
 
             SqlDataReader result = sendSqlQuery(sqlQuery);
             while (result.Read())

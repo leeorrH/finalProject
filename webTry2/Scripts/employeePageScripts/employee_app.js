@@ -198,7 +198,6 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
             //getting employees
             $http({
                 method: "POST",
-                data: { "empUserName": $scope.userName },
                 url: "getEmployeeList"
             }).then(function (dataReturn) {
 
@@ -210,7 +209,9 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
                 var data = dataReturn.data;
 
                 $.each(data, function (index, emp) {
-                    $scope.employees.push(emp);
+                    if (emp.userName != userDetails.userName) {
+                        $scope.employees.push(emp);
+                    }
                 });
 
                 $timeout(function () {
