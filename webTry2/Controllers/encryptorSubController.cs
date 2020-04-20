@@ -6,9 +6,9 @@ using System.Globalization;
 
 namespace webTry2.Controllers
 {
-    public class employeeReportSubController : DBController
+    public class EncryptorSubController : DBController
     {
-        public employeeReportSubController()
+        public EncryptorSubController()
         {
             //connect to sql
             connectToSQL();
@@ -18,10 +18,10 @@ namespace webTry2.Controllers
         {
             List<Encryptor> userEncryptors = new List<Encryptor>();
              
-
+            
             sqlQuery = "select enc.SN , CONVERT(varchar,enc.timeStamp,20) ,stat.statusName , loc.* " +
-                         " from Encryptors as enc, Locations as loc , Status as stat " +
-                          " where enc.ownerID = '" + userName + "' and enc.locationID = loc.locationID and enc.status = stat.statusID";
+                       " from Encryptors as enc, Locations as loc , Status as stat " +
+                       " where enc.ownerID = '" + userName + "' and enc.locationID = loc.locationID and enc.status = stat.statusID";
 
             command = new SqlCommand(sqlQuery, connectionToSql);
 
@@ -60,6 +60,84 @@ namespace webTry2.Controllers
             closeConnectionAndReading();
             //return Json(userEncryptors, JsonRequestBehavior.AllowGet);
             return userEncryptors;
+        }
+
+        public List<Encryptor> GetEncryptorBySN (string encSN , string tblName)
+        {
+            List<Encryptor> encList = new List<Encryptor>();
+            // set ENUM for status
+            sqlQuery = "SELECT * " +
+                       "FROM " + tblName + "  WHERE "+tblName+".SN = '" + encSN + "';";   // "FROM " + tblName + " as Enc WHERE Enc.SN = '" + encSN + "';";
+
+            dataReader = sendSqlQuery(sqlQuery);
+            if (dataReader.HasRows)
+            {
+                while (dataReader.Read())
+                {
+                    Encryptor enc = new Encryptor();
+                    enc.serialNumber = encSN;
+                    enc.timestampAsString = dataReader.GetValue(2).ToString(); //date as string
+                                                                               //enc.timestamp = DateTime.ParseExact(enc.timestampAsString, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture); //DateTime Obj
+                    enc.ownerID = dataReader.GetValue(3).ToString();
+                    enc.status = dataReader.GetValue(4).ToString();
+                    enc.deviceLocation.locationID = Int16.Parse(dataReader.GetValue(5).ToString());
+                    encList.Add(enc);
+                }
+            }
+            else encList = null;
+            if(encList != null)
+            {
+                foreach (var enc in encList)
+                {
+                    enc.deviceLocation = GetEncLocationBylocID(enc.deviceLocation.locationID.ToString());
+                }
+            }
+            closeConnectionAndReading();
+            return encList;
+        }
+
+        public List<Encryptor> EncryptorHistory(string encSN)
+        {
+
+            List<Encryptor> encHistory = GetEncryptorBySN(encSN, "EncryptorHistory");
+
+            return encHistory;
+        }
+
+        private Location GetEncLocationBylocID(string locID)
+        {
+            Location loc = new Location();
+
+            sqlQuery = "SELECT * from Locations WHERE Locations.locationID = '" + locID + "';";
+            if (dataReader.IsClosed)
+            {
+                connectToSQL();
+            }
+            else
+            {
+                closeConnectionAndReading();
+                connectToSQL();
+            }
+            dataReader = sendSqlQuery(sqlQuery);
+
+            if (dataReader.HasRows)
+            {
+                dataReader.Read();
+                loc.locationID  =   Int16.Parse(dataReader.GetValue(0).ToString());
+                loc.facility    =   dataReader.GetValue(1).ToString();
+                loc.building    =   dataReader.GetValue(2).ToString();
+                loc.floor  =   UInt16.Parse(dataReader.GetValue(3).ToString());
+                loc.room = UInt16.Parse(dataReader.GetValue(4).ToString());
+                loc.longitude = Double.Parse(dataReader.GetValue(5).ToString());
+                loc.latitude = Double.Parse(dataReader.GetValue(6).ToString());
+            }
+            else
+            {
+                Console.WriteLine("NO Location return - BUG!");
+                loc = null;
+            }
+            closeConnectionAndReading();
+            return loc;
         }
 
 

@@ -6,13 +6,17 @@ using webTry2.Controllers;
 using webTry2.Models;
 using webTry2.Models.requests;
 
+
 namespace WEB_project.Controllers
 {
     public class EmployeeController : DBController
     {
+        
         private EmployeeReportSubController empRepCtrl = new EmployeeReportSubController();
+        private EncryptorSubController encCntrl = new EncryptorSubController();
 
         public Dictionary<string,User> users = new Dictionary<string, User>();
+        public List<User> employees;
 
         // GET: Employee
         public ActionResult employeePage()
@@ -23,24 +27,21 @@ namespace WEB_project.Controllers
         [HttpPost]
         public virtual ActionResult loadEmployeeEncryptors(string userName)
         {
-            employeeReportSubController encCntrl = new employeeReportSubController();
-
             List<Encryptor> result = encCntrl.loadEncryptorByUser(userName);
 
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost] //move to DB controller
-        public ActionResult getEmployeeList(string empUserName)
+        public ActionResult getEmployeeList()
         {
-            List<User> employees = new List<User>();
+            employees = new List<User>();
             User temp;
             bool dataReaderFlag = false;
 
             connectToSQL();
             sqlQuery = "select emp.userName, emp.firstName, emp.lastName " +
-                       " from Users as emp " +
-                       " where emp.userName <> '" + empUserName + "'";
+                       " from Users as emp ";
 
             SqlDataReader result = sendSqlQuery(sqlQuery);
             while (result.Read())
@@ -98,6 +99,7 @@ namespace WEB_project.Controllers
             bool dataReaderFlag = false;
 
             connectToSQL();
+
             sqlQuery = "select distinct L.floor" +
                         " from Locations L" +
                         " where L.facility = '" + siteName + "'and L.building = '" + buildName + "';";
@@ -126,6 +128,7 @@ namespace WEB_project.Controllers
             bool dataReaderFlag = false;
 
             connectToSQL();
+
             sqlQuery = "select distinct L.room"+
                         " from Locations L"+
                         " where L.floor = '"+floorNumber+"' and L.facility = '"+ siteName + "'and L.building = '"+ buildName + "'; ";
@@ -149,6 +152,7 @@ namespace WEB_project.Controllers
         [HttpPost]
         public ActionResult SendReport(EmpReport empReport)
         {
+            connectToSQL();
             try
             {
                 switch (empReport.reportType)
@@ -163,7 +167,14 @@ namespace WEB_project.Controllers
                         empRepCtrl.changingStatus(empReport);
                         break;
                     case "deliver to employee":
-                        empRepCtrl.DeliverToEmpRepord(empReport);
+                        User previousOwner = GetUser(empReport.reportOwner);
+                        closeConnectionAndReading();
+                        connectToSQL();
+                        User newOwner = GetUser(empReport.enc.ownerID);
+                        closeConnectionAndReading();
+                        connectToSQL();
+                        empRepCtrl.DeliverToEmpReport(empReport);
+                        empRepCtrl.Sending_mail(previousOwner, newOwner, empReport);
                         break;
 
                     default:
@@ -184,43 +195,12 @@ namespace WEB_project.Controllers
         [HttpPost]
         public ActionResult getUserDetails(string userName)
         {
-            bool dataReaderFlag = false;
-            User user;
-            if (users.TryGetValue(userName,out user))
-            {
-                dataReaderFlag = true;
-            }
-            else
-            {
-                user = new User();
-
-                connectToSQL();
-
-                sqlQuery = "select *" +
-                    " from Users" +
-                    " where Users.userName = '" + userName + "'";
-
-                SqlDataReader result = sendSqlQuery(sqlQuery);
-                while (result.Read())
-                {
-                    dataReaderFlag = true;
-                    user.userName = dataReader.GetValue(0).ToString();
-                    user.firstName = dataReader.GetValue(2).ToString();
-                    user.lastName = dataReader.GetValue(3).ToString();
-                    user.email = dataReader.GetValue(4).ToString();
-                    user.phoneNumber = dataReader.GetValue(5).ToString();
-                    user.permission = dataReader.GetValue(6).ToString();
-                    user.unit = dataReader.GetValue(7).ToString();
-                }
-
-                users.Add(userName, user);
-            }
-            
-            if (dataReaderFlag == false)
-            {
+            connectToSQL();
+            User userDetails = GetUser(userName);
+            closeConnectionAndReading();
+            if (userDetails == null)
                 return Json(null, JsonRequestBehavior.AllowGet);
-            }
-            return Json(user, JsonRequestBehavior.AllowGet);
+            else  return Json(userDetails, JsonRequestBehavior.AllowGet);
 
         }
 
@@ -230,8 +210,55 @@ namespace WEB_project.Controllers
             List<EmpReport> res = null;
             if (permission.Equals("employee")) res = empRepCtrl.GetEmpReports(userName);
             else res = empRepCtrl.GetAllReports();
-            if(res.Count > 0) return Json(res, JsonRequestBehavior.AllowGet);
+            if((res != null) && (res.Count > 0)) return Json(res, JsonRequestBehavior.AllowGet);
             return Json(null , JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult getEncryptorHistory(string encSN)
+        {
+            List<Encryptor> res = encCntrl.EncryptorHistory(encSN);
+            if ((res != null) && (res.Count > 0)) return Json(res, JsonRequestBehavior.AllowGet);
+            return Json(null, JsonRequestBehavior.AllowGet);
+        }
+
+        private User GetUser(string userName)
+        {
+
+            bool dataReaderFlag = false;
+            User user;
+            if (users.TryGetValue(userName, out user))
+            {
+                dataReaderFlag = true;
+            }
+            else
+            {
+                user = new User();
+
+                
+
+                sqlQuery = "select *" +
+                    " from Users" +
+                    " where Users.userName = '" + userName + "'";
+
+                dataReader = sendSqlQuery(sqlQuery);
+                if (dataReader.HasRows)
+                {
+                    dataReader.Read();
+                    dataReaderFlag = true;
+                    user.userName = dataReader.GetValue(0).ToString();
+                    user.firstName = dataReader.GetValue(2).ToString();
+                    user.lastName = dataReader.GetValue(3).ToString();
+                    user.email = dataReader.GetValue(4).ToString();
+                    user.phoneNumber = dataReader.GetValue(5).ToString();
+                    user.permission = dataReader.GetValue(6).ToString();
+                    user.unit = dataReader.GetValue(7).ToString();
+                    users.Add(userName, user);
+                }
+                else user = null;
+            }
+
+            return user;
         }
     }
 

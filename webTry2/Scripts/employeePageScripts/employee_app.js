@@ -13,15 +13,20 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
     $scope.EncChangeStatus = true;
     $scope.approveInUse = true;
     $scope.ReasonToUpdate = true;
-    //    for EDIT and Display
+  
     /* introduction: userEncryptors including encryptors locations- lat and long!
      * markers init function: initMarkers without setting them on map
      * set Markers on map function: setMarkersOnMap
      */
     $scope.userEncryptors = [];
     $scope.userReports = [];
-    var markesrArray = [];
-    $scope.gMap;
+    var markersArray = [];
+    var historyMarkers = []; 
+    //history lines
+    var coordinatesArray = [];
+    var line;
+    //$scope.gMap;
+    var markerCluster;
 
     //user basic deatails
     var userDetails;
@@ -55,20 +60,23 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
         commonFunctions.getUserDetails(localStorage.getItem($scope.userName)).then(function (dataReturn) {
             if (dataReturn.data) {
                 userDetails = dataReturn.data;
+                $scope.userDetails = userDetails;
                 getUserEncryptors();
             }
         });
+        getAllEmployees();
     };
 
     $scope.getReports = function () {
         //getting user reports
         commonFunctions.getReports(userDetails.userName, userDetails.permission).then(function (dataReturn) {
             var reports = dataReturn.data;
+            $scope.userReports = [];
             if (reports) {
                 $.each(reports, function (index, report) {
+                    report.approvementStatus = report.approvementStatus == false ? "waiting for approvment" : "approved";
                     $scope.userReports.push(report);
                 });
-                console.log($scope.userReports);
             }
         });
     };
@@ -186,36 +194,37 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
 
 
     function getAllEmployees() {
-        //getting employees
-        $http({
-            method: "POST",
-            data: { "empUserName": $scope.userName } ,
-            url: "getEmployeeList"
-        }).then(function (dataReturn) {
+        if (angular.isDefined($scope.employees) && $scope.employees.length == 0) {
+            //getting employees
+            $http({
+                method: "POST",
+                url: "getEmployeeList"
+            }).then(function (dataReturn) {
 
-            if (dataReturn.data == "") {
-                alert("no employee return");
-                console.log("get employees maybe fail");
-                return;
-            }
-            var data = dataReturn.data;
+                if (dataReturn.data == "") {
+                    alert("no employee return");
+                    console.log("get employees maybe fail");
+                    return;
+                }
+                var data = dataReturn.data;
 
-            $.each(data, function (index, emp) {
-                $scope.employees.push(emp);
-            });
+                $.each(data, function (index, emp) {
+                    if (emp.userName != userDetails.userName) {
+                        $scope.employees.push(emp);
+                    }
+                });
 
-            $timeout(function () {
+                $timeout(function () {
                     $('.selectpicker').selectpicker('refresh'); //put it in timeout for run digest cycle
                 }, 1)
-            .catch(() => {
-                console.log('nope');
+                    .catch(() => {
+                        console.log('nope');
+                    });
             });
-        });
+        }
+        
     }
 
-    /*$scope.getEmpValue = function () {
-        var employeeUserName = $scope.emp.userName;
-    };*/
 
     $scope.getBuildings = function () {
         var x = $scope.siteName;
@@ -294,7 +303,7 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
                 });
         });
     };
-
+   
     $scope.sendReport = function () {
         let emp = $scope.emp;
         let encObj = JSON.parse(JSON.stringify($scope.userEncryptors[tempDataIndex]));
@@ -366,15 +375,9 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
         return deviceLocation;
     }
 
-
+    
     /*      map view page , second page for employee        */
-    $scope.searchResults = function () {
-        //continue with searching !
-        
-        //var searchIn = $('#searchInput').val();
-        //var result = $scope.userEncryptors.includes(searchIn);
-        //console.log(result);
-    };
+
 
     function initializeMap() {
         var googleMapOption = {
@@ -388,43 +391,52 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
 
         $scope.gMap = new google.maps.Map(document.getElementById('googleMap'), googleMapOption);
 
-        initMarkers();//init markers on map
-        clusterMarkers();
+        initMarkers($scope.userEncryptors, markersArray);//init markers on map
+        setMapOnAll($scope.gMap, markersArray);
+        clusterMarkers(markersArray);
 
     };
 
     /* introduction: init maps create markers on map while taking lat and lng from
      * userEncryptors object
-     * also push markers to markesrArray */
-    function initMarkers() {
-        angular.forEach($scope.userEncryptors, function (encryptor, index) {
+     * also push markers to markersArray */
+    function initMarkers(encryptorList , markersList) {
+        angular.forEach(encryptorList, function (encryptor, index) {
             var contentString = generateContent(encryptor);
             var marker = new google.maps.Marker({
                 //setting marker position
                 position: new google.maps.LatLng(encryptor.deviceLocation.latitude, encryptor.deviceLocation.longitude),
-                map: $scope.gMap,
                 _details: encryptor
             });
-            k = markesrArray.push(marker);
+            k = markersList.push(marker); // k is count on elements in markers array. 
 
             var infowindow = new google.maps.InfoWindow({
                 content: contentString
             });
 
-            markesrArray[k - 1].addListener('click', function () {
+            markersList[k - 1].addListener('click', function () {
                 infowindow.open($scope.gMap, marker);
             });
         });
+        clusterMarkers(markersList);
     };
 
     function generateContent(encryptor) {
+        // if there is time  - add user details to owner ID ! 
+        let employeesArray = $scope.employees;
+        let encOwner = employeesArray.find(employee => employee.userName == encryptor.ownerID);
+
+        if (angular.isUndefined(encOwner)) {
+            encOwner = userDetails;
+        }
+
         var content =
             '<div id="content" style="margin-left:5px">' +
             '<h4 style="margin-left:5px" > Encryptor details: </h4>' +
             '<ul>' +
             '<li> <b>Encryptor SN:</b> ' + encryptor.serialNumber + '</il>' +
-            '<li> <b>Time stamp:</b> ' + encryptor.timestamp + '</il>' +
-            '<li> <b>Owner:</b> ' + encryptor.ownerID + '- ' + userDetails.firstName + ' ' + userDetails.lastName + '</il> ' +
+            '<li> <b>Time stamp:</b> ' + encryptor.timestampAsString + '</il>' +
+            '<li> <b>Owner:</b> ' + encryptor.ownerID + ' - ' + encOwner.firstName + ' ' + encOwner.lastName + '</il>' +
             '<li> <b>Status:</b> ' + encryptor.status + '</il>' +
             '<li> <b>Facility:</b> ' + encryptor.deviceLocation.facility + '</il>' +
             '<li> <b>Building:</b> ' + encryptor.deviceLocation.building + '</il>' +
@@ -435,31 +447,33 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
         return content;
     }
 
-    /* introduction: clusterMarkers function cluster marker by their location 
-       markerClusterer on google */
-    function clusterMarkers() {
+    function initCluster() {
         var options_markerclusterer = {
             gridSize: 20,
             maxZoom: 18,
             zoomOnClick: false,
             imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
         };
+        markerCluster = new MarkerClusterer($scope.gMap, markersArray, options_markerclusterer);
+    }
+    /* introduction: clusterMarkers function cluster marker by their location 
+       markerClusterer on google */
+    function clusterMarkers(markersList) {
 
-        var markerCluster = new MarkerClusterer($scope.gMap, markesrArray, options_markerclusterer);
-
+        if (angular.isUndefined(markerCluster)) {
+            initCluster();
+        }
+        markerCluster.clearMarkers();
+        markerCluster.addMarkers(markersList);
+        
         google.maps.event.addListener(markerCluster, 'clusterclick', function (cluster) {
-
             var markers = cluster.getMarkers();
             var infoWindow = new google.maps.InfoWindow();
             var array = [];
-            var num = 0;
 
             for (i = 0; i < markers.length; i++) {
-
-                num++;
                 array.push(generateContent(markers[i]._details) + '<br>');
             }
-
 
             if ($scope.gMap.getZoom() > 15) { // optional: $scope.gMap.getZoom() == markerCluster.getMaxZoom()
                 infoWindow.setContent(
@@ -472,6 +486,85 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
 
     };
 
+    $scope.getEncryptorHistory = function () {
+        historyMarkers = [];
+        let tempList = [];
+        commonFunctions.getHistory($scope.mapEnc.serialNumber).then(function (dataReturn) {
+            var data = dataReturn.data;
+            if (!data) {
+                alert("no History For this encryptor");
+                return;
+            } else {
+                $.each(data, function (index, record) {
+                    tempList.push(record);
+                });
+            }
+            initMarkers(tempList, historyMarkers);
+            setMapOnAll(null, markersArray);
+            setMapOnAll($scope.gMap, historyMarkers);
+            clusterMarkers(historyMarkers);
+            setHistoryLines(historyMarkers);
+        });
+    }
+
+    $scope.returnToEncLocation = function () {
+        setMapOnAll(null, historyMarkers);
+        setMapOnAll($scope.gMap, markersArray);
+        clusterMarkers(markersArray);
+        removeHistoryLine();
+    }
+
+    function setMapOnAll(map, markersList) {
+        for (var i = 0; i < markersList.length; i++) {
+            markersList[i].setMap(map);
+        }
+    }
+
+    function removeHistoryLine() {
+        if (angular.isDefined(line)) {
+            line.setMap(null);
+            line = null;
+        }  
+    }
+
+    function setHistoryLines(historyMarkers) {
+        coordinatesArray = [];
+        if (line != null && !angular.isUndefined(line)) {
+            line.setMap(null);
+        }
+
+        angular.forEach(historyMarkers, function (marker) {
+            coordinatesArray.push({
+                lat: marker._details.deviceLocation.latitude,
+                lng: marker._details.deviceLocation.longitude
+            });
+        });
+        var currentEncLocation = markersArray.find(marker => marker._details.serialNumber == $scope.mapEnc.serialNumber)._details;
+        if (angular.isDefined(currentEncLocation)) {
+            coordinatesArray.push({
+                lat: currentEncLocation.deviceLocation.latitude,
+                lng: currentEncLocation.deviceLocation.longitude
+            });
+        }
+        
+        line = new google.maps.Polyline({
+            path: coordinatesArray,
+            geodesic: true,
+            strokeColor: '#e600e6',
+            strokeOpacity: 3.0,
+            strokeWeight: 2
+        });
+        line.setMap($scope.gMap);
+    }
+
+
+
+    /*      report view page , third page for employee        */
+    $scope.getReportData = function (index) {
+        tempDataIndex = index;
+        $scope.tempDataForEditWindow = $scope.userReports[index];
+        document.getElementById('down').href = $scope.userReports[index].reference;
+    }
 }]);
 
 
