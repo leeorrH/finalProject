@@ -7,6 +7,7 @@ using WEB_project.Controllers;
 using webTry2.Models;
 using System.Runtime.InteropServices;
 using Excel = Microsoft.Office.Interop.Excel;
+using webTry2.Models.requests;
 
 namespace webTry2.Controllers
 {
@@ -33,7 +34,7 @@ namespace webTry2.Controllers
             connectToSQL();
 
             //query for getting ALL encryptors and thier location from the user
-            sqlQuery = "select enc.SN, enc.ownerID, CONVERT(varchar,enc.timeStamp,20) ,stat.statusName , loc.* " +
+            sqlQuery = "select enc.SN, enc.ownerID, CONVERT(varchar,enc.timeStamp,20) ,stat.statusName , loc.*,CONVERT(varchar,enc.lastSeenDate,11) " +
                        " from Encryptors as enc, Locations as loc , Status as stat " +
                         " where enc.locationID = loc.locationID and enc.status = stat.statusID";
 
@@ -56,9 +57,9 @@ namespace webTry2.Controllers
                 temp.timestampAsString = dataReader.GetValue(2).ToString(); //date as string
                 temp.timestamp = DateTime.ParseExact(temp.timestampAsString, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture); // date as an object
                 temp.status = dataReader.GetValue(3).ToString(); // 
-
+                temp.lastSeenDate= dataReader.GetValue(11).ToString();//last seen Date
                 //adding data to location
-               
+
                 loc.facility = dataReader.GetValue(5).ToString();// facility
                 loc.building = dataReader.GetValue(6).ToString();// building
                 loc.floor = UInt32.Parse(dataReader.GetValue(7).ToString());// floor
@@ -114,7 +115,7 @@ namespace webTry2.Controllers
                 xlWorkSheet.Cells[i + 2, 1] = userEncryptors[i].serialNumber;
                 xlWorkSheet.Cells[i + 2, 2] = userEncryptors[i].timestampAsString;
                 xlWorkSheet.Cells[i + 2, 3] = userEncryptors[i].status;
-                xlWorkSheet.Cells[i + 2, 4] = "last seen Date";
+                xlWorkSheet.Cells[i + 2, 4] = userEncryptors[i].lastSeenDate; ;
                 //location
                 xlWorkSheet.Cells[i + 2, 5] = userEncryptors[i].deviceLocation.facility;
                 xlWorkSheet.Cells[i + 2, 6] = userEncryptors[i].deviceLocation.building;
@@ -137,6 +138,14 @@ namespace webTry2.Controllers
 
             System.Console.WriteLine("encryptor Exl Report Created !!");
             return Json("encryptor Exl Report Created !", JsonRequestBehavior.AllowGet);/// ?
+        }
+
+        [HttpPost]
+        public string setReportStatus(EmpReport reportToUpdate )
+        {
+
+            // TBD - need to change Empreport OBJ and DB Table ! there are 3 cases "waiting", "approved", "denied" - so UI (getReports) and BE ( ) need to be changed!  
+            return "";
         }
     }
 

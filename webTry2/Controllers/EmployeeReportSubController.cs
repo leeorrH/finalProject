@@ -100,6 +100,10 @@ namespace webTry2.Controllers
             sqlQuery = "SELECT * FROM EmployeeReport AS ER "+
                        "WHERE MONTH(ER.date) = MONTH(GETDATE()) " +
                        "AND YEAR(ER.date) = YEAR(GETDATE());";
+            if (!dataReader.IsClosed && dataReader.HasRows) closeConnectionAndReading();
+            if (dataReader.IsClosed)
+                connectToSQL();
+
             dataReader = sendSqlQuery(sqlQuery);
 
             reports = GetEmpReportsList(dataReader);
