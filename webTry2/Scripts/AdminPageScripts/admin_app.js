@@ -62,9 +62,9 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
                 userDetails = dataReturn.data;
                 $scope.userDetails = userDetails;
                 getUserEncryptors();
+                getAllEmployees();
             }
-        });
-        getAllEmployees();
+        });   
     };
 
     $scope.exportEncExl = function () {      
@@ -87,7 +87,6 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
             $scope.userReports = [];
             if (reports) {
                 $.each(reports, function (index, report) {
-                    report.approvementStatus = report.approvementStatus == false ? "waiting for approvment" : "approved";
                     //parse datetime to date
                     var parsedDate = new Date(parseInt(report.date.substr(6)));
                     var newDate = new Date(parsedDate);
@@ -122,6 +121,8 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
     $scope.getRowData = function (index) {
         tempDataIndex = index;
         $scope.tempDataForEditWindow = $scope.userEncryptors[index];
+        var ownerReportObj = ($scope.employees).find(emp => emp.userName == $scope.tempDataForEditWindow.ownerID);
+        $scope.ownerFullName = ownerReportObj.firstName + " " + ownerReportObj.lastName;
         //select initialize 
         switch ($scope.userEncryptors[index].status) {
             case "in use":
@@ -580,6 +581,8 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
     $scope.getReportData = function (index) {
         tempDataIndex = index;
         $scope.tempDataForEditWindow = $scope.userReports[index];
+        var ownerReportObj = ($scope.employees).find(emp => emp.userName == $scope.tempDataForEditWindow.reportOwner);
+        $scope.ownerFullName = ownerReportObj.userName + " - " + ownerReportObj.firstName + " " + ownerReportObj.lastName;
         document.getElementById('down').href = $scope.userReports[index].reference;
     }
 
@@ -589,12 +592,20 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
 
         let reportToSend = $scope.tempDataForEditWindow;
         reportToSend.approvementStatus = reportStatus;
+        reportToSend.managerInCharge = userDetails; 
         $http({
             method: "POST",
             data: { 'reportToUpdate': reportToSend },
             url: "setReportStatus"
         }).then(function (dataReturn) {
             var data = dataReturn.data;
+            if (data == "") {
+                alert("ERROR MESSAGE: updating aprovment status was failed! ");
+            }
+            else {
+                alert("successfull update approvment status");
+                $scope.tempDataForEditWindow.approvementStatus = data;
+            }
         });
     }
     

@@ -143,9 +143,31 @@ namespace webTry2.Controllers
         [HttpPost]
         public string setReportStatus(EmpReport reportToUpdate )
         {
+            string result = "";
+            //reportToUpdate.managerInCharge = employees.Find(emp => emp.userName == reportToUpdate.managerInCharge.userName);
+            sqlQuery = "UPDATE EmployeeReport " +
+                       "SET approvementStatus = '" + reportToUpdate.approvementStatus + "' ," +
+                       "managerInCharge = '" + reportToUpdate.managerInCharge.userName + "' " +
+                       "WHERE reportID = '" + reportToUpdate.reportID + "' "; 
+                             
 
+            if (!dataReader.IsClosed && dataReader.HasRows) closeConnectionAndReading();
+            if (dataReader.IsClosed)
+                connectToSQL();
+
+            var rowsEffected = sqlIUDoperation(sqlQuery);
+            if(rowsEffected == 1)
+            {
+                //call orit function
+                result = reportToUpdate.approvementStatus;
+            }
+            else
+            {
+                throw new Exception("No records was effected! ");
+            }
+            if (!dataReader.IsClosed) closeConnectionAndReading();
             // TBD - need to change Empreport OBJ and DB Table ! there are 3 cases "waiting", "approved", "denied" - so UI (getReports) and BE ( ) need to be changed!  
-            return "";
+            return result;
         }
     }
 

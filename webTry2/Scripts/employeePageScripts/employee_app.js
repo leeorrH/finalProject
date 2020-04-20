@@ -62,9 +62,10 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
                 userDetails = dataReturn.data;
                 $scope.userDetails = userDetails;
                 getUserEncryptors();
+                getAllEmployees();
             }
         });
-        getAllEmployees();
+        
     };
 
     $scope.getReports = function () {
@@ -74,7 +75,6 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
             $scope.userReports = [];
             if (reports) {
                 $.each(reports, function (index, report) {
-                    report.approvementStatus = report.approvementStatus == false ? "waiting for approvment" : "approved";
                     $scope.userReports.push(report);
                 });
             }
@@ -105,6 +105,8 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
     $scope.getRowData = function (index) {
         tempDataIndex = index;
         $scope.tempDataForEditWindow = $scope.userEncryptors[index];
+        var ownerReportObj = ($scope.employees).find(emp => emp.userName == $scope.tempDataForEditWindow.ownerID);
+        $scope.ownerFullName = ownerReportObj.firstName + " " + ownerReportObj.lastName;
         //select initialize 
         switch ($scope.userEncryptors[index].status) {
             case "in use":
@@ -563,6 +565,8 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
     $scope.getReportData = function (index) {
         tempDataIndex = index;
         $scope.tempDataForEditWindow = $scope.userReports[index];
+        var ownerReportObj = ($scope.employees).find(emp => emp.userName == $scope.tempDataForEditWindow.reportOwner);
+        $scope.ownerFullName = ownerReportObj.userName + " - " + ownerReportObj.firstName + " " + ownerReportObj.lastName;
         document.getElementById('down').href = $scope.userReports[index].reference;
     }
 }]);

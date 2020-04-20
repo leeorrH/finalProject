@@ -12,11 +12,11 @@ namespace webTry2.Controllers
     {
         private EncryptorSubController encSubCntrl = new EncryptorSubController();
 
-        public EmployeeReportSubController()
-        {
-           
-        }
+
         
+        public EmployeeReportSubController() { }
+
+
 
         public void SendMonthlyReport(EmpReport empReport)
         {
@@ -68,7 +68,7 @@ namespace webTry2.Controllers
             return;
         }
 
-        public List<EmpReport> GetEmpReports (string userName)
+        public List<EmpReport> GetEmpReports (string userName, List<User> employees)
         {
             List<EmpReport> reports = new List<EmpReport>();
            
@@ -82,7 +82,7 @@ namespace webTry2.Controllers
 
             dataReader = sendSqlQuery(sqlQuery);
 
-            reports = GetEmpReportsList(dataReader);
+            reports = GetEmpReportsList(dataReader,employees);
 
             closeConnectionAndReading();
 
@@ -93,7 +93,7 @@ namespace webTry2.Controllers
             }
         }
         
-        public List<EmpReport> GetAllReports()
+        public List<EmpReport> GetAllReports(List<User> employees)
         {
             List<EmpReport> reports = null;
 
@@ -106,7 +106,7 @@ namespace webTry2.Controllers
 
             dataReader = sendSqlQuery(sqlQuery);
 
-            reports = GetEmpReportsList(dataReader);
+            reports = GetEmpReportsList(dataReader,employees);
 
             //closeConnectionAndReading();
 
@@ -180,7 +180,7 @@ namespace webTry2.Controllers
             return deviceLocation;
         }
 
-        private List<EmpReport> GetEmpReportsList (SqlDataReader dataReader)
+        private List<EmpReport> GetEmpReportsList (SqlDataReader dataReader, List<User> employees)
         {
             List<EmpReport> reports = new List<EmpReport>();
             EmpReport temp;
@@ -206,7 +206,7 @@ namespace webTry2.Controllers
                         break;
                     case "changing encryptor status":
                         temp.enc.status = dataReader.GetValue(6).ToString();
-                        temp.reference = dataReader.GetValue(9).ToString();  // until sending file will be done
+                        temp.reference = dataReader.GetValue(9).ToString();  
                         break;
                     default:
                         break;
@@ -217,7 +217,13 @@ namespace webTry2.Controllers
                     temp.notifications = dataReader.GetValue(8).ToString(); // can be null 
                 }
                
-                temp.approvementStatus = bool.Parse(dataReader.GetValue(10).ToString());
+                temp.approvementStatus = dataReader.GetValue(10).ToString();
+                 
+                if (!String.IsNullOrEmpty(dataReader.GetValue(11).ToString())) // check if manager in charge is exist
+                {
+                    string managerUserName = dataReader.GetValue(11).ToString();
+                    temp.managerInCharge = employees.Find(emp => emp.userName == managerUserName);
+                }
                 reports.Add(temp);
             }
             

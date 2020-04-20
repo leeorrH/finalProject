@@ -16,7 +16,7 @@ namespace WEB_project.Controllers
         private EncryptorSubController encCntrl = new EncryptorSubController();
 
         public Dictionary<string,User> users = new Dictionary<string, User>();
-        public List<User> employees;
+        public static List<User> employees = new List<User>();
 
         // GET: Employee
         public ActionResult employeePage()
@@ -35,7 +35,8 @@ namespace WEB_project.Controllers
         [HttpPost] //move to DB controller
         public ActionResult getEmployeeList()
         {
-            employees = new List<User>();
+            if(employees.Count != 0) return Json(employees, JsonRequestBehavior.AllowGet);
+
             User temp;
             bool dataReaderFlag = false;
 
@@ -59,6 +60,7 @@ namespace WEB_project.Controllers
             {
                 return Json(null, JsonRequestBehavior.AllowGet);
             }
+            
             return Json(employees, JsonRequestBehavior.AllowGet);
         }
 
@@ -208,8 +210,8 @@ namespace WEB_project.Controllers
         public ActionResult getRequests(string userName , string permission)
         {
             List<EmpReport> res = null;
-            if (permission.Equals("employee")) res = empRepCtrl.GetEmpReports(userName);
-            else res = empRepCtrl.GetAllReports();
+            if (permission.Equals("employee")) res = empRepCtrl.GetEmpReports(userName, employees);
+            else res = empRepCtrl.GetAllReports(employees);
             if((res != null) && (res.Count > 0)) return Json(res, JsonRequestBehavior.AllowGet);
             return Json(null , JsonRequestBehavior.AllowGet);
         }
