@@ -36,13 +36,32 @@ namespace webTry2.Controllers
 
         public void closeConnectionAndReading()
         {
-            connectionToSql.Close();
-            dataReader.Close();
+            try
+            {
+                connectionToSql.Close();
+            }
+            catch
+            {
+                System.Console.WriteLine("connection to sql is closed/n");
+            }
+            try
+            {
+                dataReader.Close();
+            }
+            catch
+            {
+                System.Console.WriteLine("datareader is closed/n");
+            }
         }
 
         public SqlDataReader sendSqlQuery(string sqlQuery)
         {
             command = new SqlCommand(sqlQuery, connectionToSql);
+            if (!dataReader.IsClosed)
+            {
+                closeConnectionAndReading();
+                connectToSQL();
+            }
             dataReader = command.ExecuteReader();
             return dataReader;
         }

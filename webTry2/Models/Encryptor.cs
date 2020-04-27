@@ -13,7 +13,7 @@ namespace webTry2.Models
         public string ownerID { get; set; }
         public string status { get; set; }
         public Location deviceLocation { get; set; }
-        public string lastSeenDate { get; set; }
+        public string lastReported { get; set; }
         public Encryptor(){
 
             deviceLocation = new Location();

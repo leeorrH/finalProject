@@ -79,7 +79,7 @@ namespace webTry2.Controllers
                     enc.timestampAsString = dataReader.GetValue(2).ToString(); //date as string
                                                                                //enc.timestamp = DateTime.ParseExact(enc.timestampAsString, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture); //DateTime Obj
                     enc.ownerID = dataReader.GetValue(3).ToString();
-                    enc.status = dataReader.GetValue(4).ToString();
+                    enc.status = StatusNumberToString(Int16.Parse(dataReader.GetValue(4).ToString()));
                     enc.deviceLocation.locationID = Int16.Parse(dataReader.GetValue(5).ToString());
                     encList.Add(enc);
                 }
@@ -140,6 +140,28 @@ namespace webTry2.Controllers
             return loc;
         }
 
-
+        public string StatusNumberToString (int encStatus)
+        {
+            string status = "";
+            switch (encStatus)
+            {
+                case 1:
+                    status = "in use";
+                    break;
+                case 2:
+                    status = "destroyed";
+                    break;
+                case 3:
+                    status = "lost";
+                    break;
+                case 4:
+                    status = "delivered";
+                    break;
+                default:
+                    status = "in use";
+                    break;
+            }
+            return status;
+        }
     }
 }

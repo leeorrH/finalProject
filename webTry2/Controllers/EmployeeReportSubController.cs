@@ -12,7 +12,6 @@ namespace webTry2.Controllers
     {
         private EncryptorSubController encSubCntrl = new EncryptorSubController();
 
-
         
         public EmployeeReportSubController() { }
 
@@ -22,7 +21,7 @@ namespace webTry2.Controllers
         {
 
             sqlQuery = "INSERT INTO dbo.EmployeeReport (reportType,reportOwner, date,encSN, ownerID,encStatus,location,notifications,reference,approvementStatus)" +
-                          " VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateToString(empReport) + "', '" + empReport.enc.serialNumber + "', NULL, NULL, NULL,'" + empReport.notifications + "', NULL, 'false'); ";
+                          " VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateToString(empReport) + "', '" + empReport.enc.serialNumber + "', NULL, NULL, NULL,'" + empReport.notifications + "', NULL, 'waiting for approvment'); ";
             var res=sqlIUDoperation(sqlQuery); 
             if (res == 0)
             {
@@ -34,14 +33,15 @@ namespace webTry2.Controllers
         public void ChangingEncLocationReport(EmpReport empReport)
         {
             //getting location ID  
-
+          
             empReport.enc.deviceLocation = SetLocationID(empReport.enc.deviceLocation);
-            
+            if (dataReader.IsClosed)
+                connectToSQL();
             if (empReport.enc.deviceLocation != null)
             {
                 sqlQuery = "INSERT INTO dbo.EmployeeReport (reportType,reportOwner, date,encSN, ownerID,encStatus,location,notifications,reference,approvementStatus) " +
                         "OUTPUT inserted.reportID " +
-                        "VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateToString(empReport) + "', '" + empReport.enc.serialNumber + "', NULL, NULL,'" +empReport.enc.deviceLocation.locationID+ "' ,'" + empReport.notifications + "', NULL, 'false'); ";
+                        "VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateToString(empReport) + "', '" + empReport.enc.serialNumber + "', NULL, NULL,'" +empReport.enc.deviceLocation.locationID+ "' ,'" + empReport.notifications + "', NULL, 'waiting for approvment'); ";
 
                 var res = sqlIUDoperation(sqlQuery); // TODO if false then ... 
                 if (res == 0)
@@ -49,6 +49,7 @@ namespace webTry2.Controllers
                     throw new System.InvalidOperationException("operation FAILED! NO ROWS HAS BEEN EFFECTED");
                 }
             }
+            closeConnectionAndReading();
             return;
         }
 
@@ -59,13 +60,60 @@ namespace webTry2.Controllers
              connectToSQL();
              sqlQuery = "INSERT INTO dbo.EmployeeReport (reportType,reportOwner, date,encSN, ownerID,encStatus,location,notifications,reference,approvementStatus) " +
                         "OUTPUT inserted.reportID " +
-                        "VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateToString(empReport) + "', '" + empReport.enc.serialNumber + "', '" + empReport.enc.ownerID + "', NULL,'" + empReport.enc.deviceLocation.locationID + "' ,'" + empReport.notifications + "', NULL, 'false'); ";
+                        "VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateToString(empReport) + "', '" + empReport.enc.serialNumber + "', '" + empReport.enc.ownerID + "', NULL,'" + empReport.enc.deviceLocation.locationID + "' ,'" + empReport.notifications + "', NULL, 'waiting for approvment'); ";
             var res = sqlIUDoperation(sqlQuery); // TODO if false then ... 
             if (res == 0)
             {
                 throw new System.InvalidOperationException("operation FAILED! NO ROWS HAS BEEN EFFECTED");
             }
             return;
+        }
+
+ //orit
+        public void changingStatus(EmpReport empReport)
+        {
+            int statusNumber = -1;
+            switch (empReport.enc.status)
+            {
+                case "destroyed":
+                    statusNumber = 2;
+                    break;
+                case "lost":
+                    statusNumber = 3;
+                    break;
+                case "delivered":
+                    statusNumber = 4;
+                    break;
+                default:
+                    System.Console.WriteLine(" status was not valid and set as -in use- ! ");
+                    statusNumber = 1;
+                    break;
+            }
+            closeConnectionAndReading();
+            connectToSQL();
+            sqlQuery = "INSERT INTO dbo.EmployeeReport (reportType,reportOwner, date,encSN, ownerID,encStatus,location,notifications,reference,approvementStatus)" +
+                     " VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateToString(empReport) + "', '" + empReport.enc.serialNumber + "', NULL, " + statusNumber + ", NULL,'" + empReport.notifications + "','"+empReport.reference+ "', 'waiting for approvment'); ";
+            var res = sqlIUDoperation(sqlQuery);
+            if (res == 0)
+            {
+                throw new System.InvalidOperationException("operation FAILED! NO ROWS HAS BEEN EFFECTED");
+            }
+            if (!dataReader.IsClosed)
+            {
+                closeConnectionAndReading();
+            }
+            return;
+
+
+            /*
+            SqlCommand command;
+            SqlConnection connection = new SqlConnection(connectionString);
+            command = new SqlCommand("INSERT INTO FileTable (File) Values(@File)", connection);
+            command.Parameters.Add("@File", SqlDbType.Binary, file.Length).Value = file;
+            connection.Open();
+            command.ExecuteNonQuery();
+            */
+
         }
 
         public List<EmpReport> GetEmpReports (string userName, List<User> employees)
@@ -116,42 +164,9 @@ namespace webTry2.Controllers
                 return null;
             }
         }
-        //orit
-        public void changingStatus(EmpReport empReport)
-        {
-            if (dataReader.IsClosed)
-            {
-                connectToSQL();
-            }
-            sqlQuery = "INSERT INTO dbo.EmployeeReport (reportType,reportOwner, date,encSN, ownerID,encStatus,location,notifications,reference,approvementStatus)" +
-                     " VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateToString(empReport) + "', '" + empReport.enc.serialNumber + "', NULL, NULL, NULL,'" + empReport.notifications + "','"+empReport.reference+"', 'false'); ";
-            var res = sqlIUDoperation(sqlQuery);
-            if (res == 0)
-            {
-                throw new System.InvalidOperationException("operation FAILED! NO ROWS HAS BEEN EFFECTED");
-            }
-            if (!dataReader.IsClosed)
-            {
-                closeConnectionAndReading();
-            }
-            return;
+       
 
-
-
-
-
-            /*
-            SqlCommand command;
-            SqlConnection connection = new SqlConnection(connectionString);
-            command = new SqlCommand("INSERT INTO FileTable (File) Values(@File)", connection);
-            command.Parameters.Add("@File", SqlDbType.Binary, file.Length).Value = file;
-            connection.Open();
-            command.ExecuteNonQuery();
-            */
-
-        }
-
-        private string DateToString(EmpReport rep)
+        public string DateToString(EmpReport rep)
         {
             return rep.date.ToString("yyyy-MM-dd HH:mm:ss.fff");
         }

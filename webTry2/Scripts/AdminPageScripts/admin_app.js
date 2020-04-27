@@ -80,22 +80,7 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
         });
     };
 
-    $scope.getReports = function () {
-        //getting user reports
-        commonFunctions.getReports(userDetails.userName, userDetails.permission).then(function (dataReturn) {
-            var reports = dataReturn.data;
-            $scope.userReports = [];
-            if (reports) {
-                $.each(reports, function (index, report) {
-                    //parse datetime to date
-                    var parsedDate = new Date(parseInt(report.date.substr(6)));
-                    var newDate = new Date(parsedDate);
-                    report.date = newDate.getDay() + " - " + newDate.getMonth() + " - " + newDate.getFullYear();
-                    $scope.userReports.push(report);
-                });
-            }
-        });
-    };
+   
 
     function getUserEncryptors() {
         //getting encryptors
@@ -578,17 +563,38 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
 
 
     /*      report view page , third page for employee        */
+
+    $scope.getReports = function () {
+        //getting user reports
+        commonFunctions.getReports(userDetails.userName, userDetails.permission).then(function (dataReturn) {
+            var reports = dataReturn.data;
+            $scope.userReports = [];
+            if (reports) {
+                $.each(reports, function (index, report) {
+                    //parse datetime to date
+                    var parsedDate = new Date(parseInt(report.date.substr(6)));
+                    var newDate = new Date(parsedDate);
+                    report.date = newDate.getDay() + " - " + newDate.getMonth() + " - " + newDate.getFullYear();
+                    $scope.userReports.push(report);
+                });
+            }
+        });
+    };
+
     $scope.getReportData = function (index) {
         tempDataIndex = index;
         $scope.tempDataForEditWindow = $scope.userReports[index];
         var ownerReportObj = ($scope.employees).find(emp => emp.userName == $scope.tempDataForEditWindow.reportOwner);
+        if (angular.isUndefined(ownerReportObj)) {
+            ownerReportObj = userDetails;
+        }
         $scope.ownerFullName = ownerReportObj.userName + " - " + ownerReportObj.firstName + " " + ownerReportObj.lastName;
         document.getElementById('down').href = $scope.userReports[index].reference;
     }
 
     $scope.setReportStatus = function (reportStatus) {
         if (reportStatus == 'deny') reportStatus = 'denied';
-        else reportStatus = 'accepted';
+        else reportStatus = 'approved';
 
         let reportToSend = $scope.tempDataForEditWindow;
         reportToSend.approvementStatus = reportStatus;

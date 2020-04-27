@@ -317,7 +317,7 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
             notifications: "" + (($scope.notification == undefined) ? "" : $scope.notification),
             enc: encObj ,
             reference: null,
-            approvementStatus: false
+            approvementStatus: 'waiting for approvment'
         };
         let statusCaseFlag = false;
         
