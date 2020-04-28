@@ -220,7 +220,7 @@ namespace webTry2.Controllers
                         temp.enc.deviceLocation.locationID = Int16.Parse(dataReader.GetValue(7).ToString());
                         break;
                     case "changing encryptor status":
-                        temp.enc.status = dataReader.GetValue(6).ToString();
+                        temp.enc.status = encSubCntrl.StatusNumberToString( Int16.Parse( dataReader.GetValue(6).ToString() ) );
                         temp.reference = dataReader.GetValue(9).ToString();  
                         break;
                     default:
@@ -240,6 +240,15 @@ namespace webTry2.Controllers
                     temp.managerInCharge = employees.Find(emp => emp.userName == managerUserName);
                 }
                 reports.Add(temp);
+            }
+
+            
+            foreach(EmpReport report in reports)
+            {
+                if(report.reportType == "deliver to employee" || report.reportType == "changing encryptor location")
+                {
+                    report.enc.deviceLocation = GetLocationByID(report.enc.deviceLocation.locationID);
+                }
             }
             
             return reports;
@@ -299,6 +308,35 @@ namespace webTry2.Controllers
             }
         }
 
+        public Location GetLocationByID (int locationID)
+        {
+            Location location = null;
+            closeConnectionAndReading();
+            connectToSQL();
+
+            sqlQuery = "SELECT * " +
+                       "FROM Locations as Loc " +
+                       "WHERE Loc.locationID = '" + locationID + "'";
+            dataReader = sendSqlQuery(sqlQuery);
+
+            if (dataReader.Read())
+            {
+                location = new Location();
+                location.locationID = locationID;
+                location.facility = dataReader.GetValue(1).ToString();
+                location.building = dataReader.GetValue(2).ToString(); 
+                location.floor = UInt16.Parse(dataReader.GetValue(3).ToString());
+                location.room = UInt16.Parse(dataReader.GetValue(4).ToString());
+                //location.latitude = dataReader.GetValue(1).ToString();
+                //location.longitude = dataReader.GetValue(1).ToString();
+            }
+            else
+            {
+                throw new Exception("NO Location returned from DB");
+            }
+            closeConnectionAndReading();
+            return location;
+        } 
     }
 }
 

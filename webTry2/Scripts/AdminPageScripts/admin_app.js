@@ -13,6 +13,7 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
     $scope.EncChangeStatus = true;
     $scope.approveInUse = true;
     $scope.ReasonToUpdate = true;
+    $scope.isReportValid = false;
 
     /* introduction: userEncryptors including encryptors locations- lat and long!
      * markers init function: initMarkers without setting them on map
@@ -149,14 +150,14 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
         $scope.locationDetails = true;
         $scope.EncChangeStatus = true;
 
-        $scope.SelectesReasonReport = "";
-        $scope.encStatus = "";
-        $scope.siteName = "";
-        $scope.buildName = "";
-        $scope.floorNumber = "";
-        $scope.room = "";
+        $scope.SelectesReasonReport = undefined;
+        $scope.encStatus = undefined;
+        $scope.siteName = undefined;
+        $scope.buildName = undefined;
+        $scope.floorNumber = undefined;
+        $scope.room = undefined;
 
-        $scope.notification = "";
+        $scope.notification = undefined;
     }
 
     $scope.ReportAbout = function (reportReason) {
@@ -230,9 +231,8 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
 
 
     $scope.getBuildings = function () {
-        var x = $scope.siteName;
-        if ($scope.siteName == "") {
-            $scope.buildings = "";
+        if ($scope.siteName == undefined) {
+            $scope.buildings = undefined;
         }
         else {
             //getting building
@@ -308,6 +308,8 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
     };
 
     $scope.sendReport = function () {
+
+       
         let emp = $scope.emp;
         let encObj = JSON.parse(JSON.stringify($scope.userEncryptors[tempDataIndex]));
         var report = {
@@ -325,33 +327,55 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
         switch (report.reportType) {
             case 'monthly report':
                 // TODO
+
                 break;
+
             case 'changing encryptor location':
                 report.enc.deviceLocation = settingNewLocation(report.enc.deviceLocation);
+                if (angular.isDefined($scope.siteName) && angular.isDefined($scope.buildName) && angular.isDefined($scope.floorNumber) && angular.isDefined($scope.room)) {
+                    $scope.isReportValid = true;
+                }
                 break;
+
             case 'changing encryptor status':
-                statusCaseFlag = true;
+                
                 report.enc.status = "" + $scope.encStatus;
 
                 var filerReader = new FileReader();
                 filerReader.onload = function (event) {
                     var res = event.target.result;
                     report.reference = res;
+                    if (angular.isDefined($scope.encStatus)) {
+                        $scope.isReportValid = true;
+                    }
                     postReport(report);
                 }
                 var fileList = document.getElementById('refFile').files;
                 filerReader.readAsDataURL(fileList[0]);
 
+                if (angular.isDefined($scope.encStatus)) {
+                    $scope.isReportValid = true;
+                }
+
                 break;
+
             case 'deliver to employee':
                 report.enc.ownerID = "" + emp.userName;
                 report.enc.deviceLocation = settingNewLocation(report.enc.deviceLocation);
+
+                if (angular.isDefined($scope.emp) && angular.isDefined($scope.siteName) && angular.isDefined($scope.buildName) && angular.isDefined($scope.floorNumber) && angular.isDefined($scope.room)) {
+                    $scope.isReportValid = true;
+                }
                 break;
         }
         if (statusCaseFlag == true) {
             statusCaseFlag = false;
         } else {
-            postReport(report);
+            if ($scope.isReportValid) postReport(report);
+            else {
+                alert("please fill all fildes befor clicking send");
+            }
+            $scope.isReportValid = false;
         }
 
 
@@ -584,12 +608,17 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
     $scope.getReportData = function (index) {
         tempDataIndex = index;
         $scope.tempDataForEditWindow = $scope.userReports[index];
+
         var ownerReportObj = ($scope.employees).find(emp => emp.userName == $scope.tempDataForEditWindow.reportOwner);
         if (angular.isUndefined(ownerReportObj)) {
             ownerReportObj = userDetails;
         }
         $scope.ownerFullName = ownerReportObj.userName + " - " + ownerReportObj.firstName + " " + ownerReportObj.lastName;
-        document.getElementById('down').href = $scope.userReports[index].reference;
+
+        if ($scope.tempDataForEditWindow.reportType == "changing encryptor status	") {
+            document.getElementById('down').href = $scope.userReports[index].reference;
+        }
+        
     }
 
     $scope.setReportStatus = function (reportStatus) {
