@@ -53,7 +53,7 @@
                 <li>
                     <a style="cursor:pointer" onclick="$('#encryptorManagmentPage').show();
                                                             $('#encryptorMappingPage').hide();
-                                                            $('#empRequestPage').hide();">Encryptor managment <img src="@Url.Content("~/Content/images/icons8-bookmark-64.png")" style="width:30px" /></a>
+                                                            $('#empRequestPage').hide();">Encryptor managment<img src="@Url.Content("~/Content/images/icons8-bookmark-64.png")" style="width:30px" /></a>
                 </li>
                 <li>
                     <a style="cursor:pointer" onclick="$('#encryptorMappingPage').show();
@@ -77,7 +77,7 @@
             <div class="table-title">
                 <div class="row">
                     <div class="col-sm-6">
-                        <h2>Manage my<b> Encryptors</b></h2>
+                        <h2>Manage All<b> Encryptors</b></h2>
                     </div>
                     <div class="col-sm-6">
                         <button style="float:right; border:none; background:none"><img src="@Url.Content("~/Content/images/icons8-add-96.png")" style="width:30px" /></button>
@@ -92,7 +92,7 @@
                         <th><input type="text" ng-model="searchtxt.deviceLocation.facility" class="form-control" placeholder="Facility"></th>
                         <th><input type="text" ng-model="searchtxt.deviceLocation.building" class="form-control" placeholder="Building"></th>
                         <th><input type="text" ng-model="searchtxt.status" class="form-control" placeholder="Status"></th>
-                        <th><button type="button" class="btn btn-block btn-info"  ng-click="exportEncExl()" >Export info <img src="@Url.Content("~/Content/images/icons8-microsoft-excel-2019-96.png")" style="width:30px" /></button></th>
+                        <th><button type="button" class="btn btn-block btn-info" ng-click="exportEncExl()">Export info <img src="@Url.Content("~/Content/images/icons8-microsoft-excel-2019-96.png")" style="width:30px" /></button></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -168,7 +168,7 @@
             <div class="modal-content">
                 <form name="reportForm">
                     <div class="modal-header">
-                        <h4 class="modal-title">Encryptor data</h4>
+                        <h4 class="modal-title">Edit report</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cleanReport()">&times;</button>
                     </div>
                     <div class="modal-body">
@@ -187,7 +187,7 @@
                             </div>
                             <div>
                                 <!-- col 2  -->
-                                <div ng-hide="EncChangeStatus" class="ng-hide" >
+                                <div ng-hide="EncChangeStatus" class="ng-hide">
                                     <div class="form-group">
                                         <label>Enc. status: </label>
                                         <div>
@@ -212,7 +212,7 @@
                                     <div class="form-group">
                                         <label>Enc. site: </label>
                                         <div>
-                                            <select class="selectpicker" data-live-search="true" ng-model="siteName" ng-change="getBuildings()" ng-required=" SelectesReasonReport == 'deliver to employee' ? true : 
+                                            <select class="selectpicker" data-live-search="true" ng-model="siteName" ng-change="getBuildings()" ng-required=" SelectesReasonReport == 'deliver to employee' ? true :
                                                                                                                                                                SelectesReasonReport ==  'changing encryptor location'? true : false">
                                                 <option data-tokens="leshem">Leshem</option>
                                                 <option data-tokens="david">David</option>
@@ -225,7 +225,7 @@
                                         <div>
                                             <select reference="toReset" ng-model="buildName" ng-options="building as building
                                                         for building in buildings" ng-change="getfloors()" class="selectpicker" data-live-search="true"
-                                                    ng-required=" SelectesReasonReport == 'deliver to employee' ? true : 
+                                                    ng-required=" SelectesReasonReport == 'deliver to employee' ? true :
                                                                   SelectesReasonReport ==  'changing encryptor location'? true : false"></select>
                                         </div>
                                     </div>
@@ -234,7 +234,7 @@
                                         <div>
                                             <select reference="toReset" ng-model="floorNumber" ng-options="floor as floor
                                                         for floor in floors" ng-change="getroom()" class="selectpicker" data-live-search="true"
-                                                        ng-required=" SelectesReasonReport == 'deliver to employee' ? true : 
+                                                    ng-required=" SelectesReasonReport == 'deliver to employee' ? true :
                                                                   SelectesReasonReport ==  'changing encryptor location'? true : false"></select>
                                         </div>
                                     </div>
@@ -243,13 +243,15 @@
                                         <div>
                                             <select reference="toReset" ng-model="room" ng-options="room as room
                                                         for room in rooms" class="selectpicker" data-live-search="true"
-                                                        ng-required=" SelectesReasonReport == 'deliver to employee' ? true : 
-                                                                  SelectesReasonReport ==  'changing encryptor location'? true : false">></select>
+                                                    ng-required=" SelectesReasonReport == 'deliver to employee' ? true :
+                                                                  SelectesReasonReport ==  'changing encryptor location'? true : false">
+                                                >
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
 
-                               
+
                             </div>
 
                             <div>
@@ -303,7 +305,7 @@
                             </div>
                             <div style="width:70%; height: 100px; margin:10px">
                                 <label>notifications</label>
-                                <textarea class="form-control" style="height: 80%" 
+                                <textarea class="form-control" style="height: 80%"
                                           ng-model="notification"></textarea>
                             </div>
                             <label>Please pay attention that the time stamp field will update automaticly when submited.</label>
@@ -363,7 +365,7 @@
             <div class="table-title">
                 <div class="row">
                     <div class="col-sm-6">
-                        <h2>Manage my<b> Reports</b></h2>
+                        <h2>Manage All<b> Reports</b></h2>
                     </div>
                 </div>
             </div>
@@ -440,13 +442,9 @@
 
                         <div class="form-group" ng-if="tempDataForEditWindow.reportType == 'deliver to employee'">
                             <label>New owner</label>
-                            <input type="text" class="form-control" readonly ng-model="tempDataForEditWindow.enc.ownerID" /> <!-- add full name -->
+                            <input type="text" class="form-control" readonly ng-model="newOwnerFullName" /> <!-- add full name -->
                         </div>
 
-                        <div class="form-group" ng-if="tempDataForEditWindow.reportType == 'deliver to employee'">
-                            <label>Previous owner</label>
-                            <input type="text" class="form-control" readonly ng-model="" /> <!-- add full name -->
-                        </div>
                         <!--                          deliver to employee flieds                   -->
 
                         <div class="form-group flex-container" ng-if="tempDataForEditWindow.reportType == 'deliver to employee' || tempDataForEditWindow.reportType == 'changing encryptor location'">
@@ -460,25 +458,25 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label> facility </label>
-                                    <input type="text" class="form-control" readonly ng-model="" />
+                                    <input type="text" class="form-control" readonly ng-model="currentEncData.deviceLocation.facility" />
                                 </div>
                                 <!--   facility -->
 
                                 <div class="form-group">
                                     <label> building </label>
-                                    <input type="text" class="form-control" readonly ng-model="" />
+                                    <input type="text" class="form-control" readonly ng-model="currentEncData.deviceLocation.building" />
                                 </div>
                                 <!--   building -->
 
                                 <div class="form-group">
                                     <label> floor </label>
-                                    <input type="text" class="form-control" readonly ng-model="" />
+                                    <input type="text" class="form-control" readonly ng-model="currentEncData.deviceLocation.floor" />
                                 </div>
                                 <!--   floor -->
 
                                 <div class="form-group">
                                     <label> room </label>
-                                    <input type="text" class="form-control" readonly ng-model="" />
+                                    <input type="text" class="form-control" readonly ng-model="currentEncData.deviceLocation.room" />
                                 </div>
                                 <!--   room -->
                             </div>
@@ -515,13 +513,15 @@
                                 <input id="acceptBtn" type="button" class="btn btn-success" style="float:right" value="Accept" ng-click="setReportStatus('accept')">
                             </div>
                         </div>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
+
 </body>
-</html>
+    </html>
 
 
 

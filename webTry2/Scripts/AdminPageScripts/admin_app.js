@@ -108,6 +108,9 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
         tempDataIndex = index;
         $scope.tempDataForEditWindow = $scope.userEncryptors[index];
         var ownerReportObj = ($scope.employees).find(emp => emp.userName == $scope.tempDataForEditWindow.ownerID);
+        if (angular.isUndefined(ownerReportObj)) {
+            ownerReportObj = userDetails;
+        }
         $scope.ownerFullName = ownerReportObj.firstName + " " + ownerReportObj.lastName;
         //select initialize 
         switch ($scope.userEncryptors[index].status) {
@@ -615,9 +618,25 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
         }
         $scope.ownerFullName = ownerReportObj.userName + " - " + ownerReportObj.firstName + " " + ownerReportObj.lastName;
 
-        if ($scope.tempDataForEditWindow.reportType == "changing encryptor status	") {
-            document.getElementById('down').href = $scope.userReports[index].reference;
+        switch ($scope.tempDataForEditWindow.reportType) {
+            case "changing encryptor status":
+                document.getElementById('down').href = $scope.userReports[index].reference;
+                break;
+            case "deliver to employee":
+                let newOwner = ($scope.employees).find(emp => emp.userName == $scope.tempDataForEditWindow.enc.ownerID);
+                if (angular.isUndefined(newOwner)) {
+                    newOwner = userDetails;
+                }
+                $scope.newOwnerFullName = newOwner.userName + " - " + newOwner.firstName + " " + newOwner.lastName;
+
+            case "changing encryptor location":
+                $scope.currentEncData = ($scope.userEncryptors).find(enc => enc.serialNumber == $scope.tempDataForEditWindow.enc.serialNumber);
+                break;
+            default:
+                break;
         }
+        
+
         
     }
 
