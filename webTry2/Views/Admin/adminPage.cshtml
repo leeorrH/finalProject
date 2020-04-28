@@ -72,6 +72,7 @@
         </div>
     </nav>
 
+    <!-- Manage encryptor Table -->
     <div class="container" id="encryptorManagmentPage">
         <div class="table-wrapper" style="margin-top:40px">
             <div class="table-title">
@@ -80,7 +81,7 @@
                         <h2>Manage All<b> Encryptors</b></h2>
                     </div>
                     <div class="col-sm-6">
-                        <button style="float:right; border:none; background:none"><img src="@Url.Content("~/Content/images/icons8-add-96.png")" style="width:30px" /></button>
+                        <a href="#AddEncModal" data-toggle="modal" style="float:right; border:none; background:none"><img src="@Url.Content("~/Content/images/icons8-add-96.png")" style="width:30px" /></a>
                     </div>
                 </div>
             </div>
@@ -112,7 +113,96 @@
         </div>
     </div>
 
+    <!-- Add new encryptor modal -->
+    <div id="AddEncModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addForm">
+                    <div class="modal-header">
+                        <div class="flex-container">
+                            <h4 class="modal-title">Add Encryptor</h4>
+                            <button type="button" class="close" style="margin-left:75%" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Serial number</label>
+                            <input type="text" class="form-control" ng-required="true">
+                        </div>
+                        <!-- date -->
+                        <div class="form-group">
+                            <label>Time-stamp</label>
+                            <input type="datetime" class="form-control" ng-required="true">
+                        </div>
+                        <!-- owner-->
+                        <div class="form-group">
+                            <label>Owner: </label>
+                            <div>
+                                <select  ng-model="emp" ng-options="employee as employee.userName + ' - ' + employee.firstName + ' ' + employee.lastName
+                                                        for employee in employees"
+                                        class="selectpicker" data-live-search="true" ng-required="true"></select>
+                            </div>
+                        </div>
+                        <!-- status -->
+                        <div>
+                            <div class="form-group">
+                                <label>Status: </label>
+                                <input type="datetime" class="form-control" readonly value="is use">
+                            </div>
+                        </div>
+                        <!-- facility -->
+                        <div>
+                            <div class="form-group">
+                                <label>facility: </label>
+                                <div>
+                                    <select class="selectpicker" data-live-search="true" ng-required="true">
+                                        <option ng-selected disabled value="">Select facility</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- building -->
+                        <div>
+                            <div class="form-group">
+                                <label>building: </label>
+                                <div>
+                                    <select class="selectpicker" data-live-search="true" ng-required="true">
+                                        <option ng-selected disabled value="">Select building</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- floor -->
+                        <div>
+                            <div class="form-group">
+                                <label>floor: </label>
+                                <div>
+                                    <select class="selectpicker" data-live-search="true" ng-required="true">
+                                        <option ng-selected disabled value="">Select floor</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- room -->
+                        <div>
+                            <div class="form-group">
+                                <label>room: </label>
+                                <div>
+                                    <select class="selectpicker" data-live-search="true" ng-required="true">
+                                        <option ng-selected disabled value="">Select room</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
 
+                        <div style="display:flow-root">
+                            <button type="submit" data-dismiss="modal" aria-hidden="true" class="btn btn-success" style="margin-right:10%" ng-disabled="!addForm.$valid"> Add Encryptor </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- View encryptor data Modal HTML -->
     <div id="viewEncryptorDataModal" class="modal fade">
@@ -120,8 +210,10 @@
             <div class="modal-content">
                 <form>
                     <div class="modal-header">
-                        <h4 class="modal-title">Encryptor data</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <div class="flex-container">
+                            <h4 class="modal-title">Encryptor data</h4>
+                            <button type="button" class="close" style="margin-left:75%" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        </div>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
@@ -168,8 +260,10 @@
             <div class="modal-content">
                 <form name="reportForm">
                     <div class="modal-header">
-                        <h4 class="modal-title">Edit report</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cleanReport()">&times;</button>
+                        <div class="flex-container">
+                            <h4 class="modal-title">Edit report</h4>
+                            <button type="button" class="close" data-dismiss="modal" style="margin-left:90%" aria-hidden="true" ng-click="cleanReport()">&times;</button>
+                        </div>
                     </div>
                     <div class="modal-body">
                         <div class="form-group flex-container">
@@ -199,6 +293,10 @@
                                         </div>
                                         <input type="file" value="add reference" class="btn btn-primary" style="width:70%; margin-top:5%" id="refFile" ng-hide="attachReference" ng-required="SelectesReasonReport == 'changing encryptor status' ? true : false" />
                                     </div>
+                                </div>
+
+                                <div ng-hide="approveInUse" class="form-group"style="margin-top: 6%;margin-right: 30%;">
+                                    <input type="checkbox" ng-required=" SelectesReasonReport == 'monthly report' ? true : false " />    I declare that I have seen this Encryptor with my own eyes
                                 </div>
 
                                 <div ng-hide="deliverToEmpDetails" class="ng-hide">
@@ -244,14 +342,10 @@
                                             <select reference="toReset" ng-model="room" ng-options="room as room
                                                         for room in rooms" class="selectpicker" data-live-search="true"
                                                     ng-required=" SelectesReasonReport == 'deliver to employee' ? true :
-                                                                  SelectesReasonReport ==  'changing encryptor location'? true : false">
-                                                >
-                                            </select>
+                                                                  SelectesReasonReport ==  'changing encryptor location'? true : false"></select>
                                         </div>
                                     </div>
                                 </div>
-
-
                             </div>
 
                             <div>
@@ -298,7 +392,6 @@
                             </div>
 
                         </div>
-                        <div ng-hide="approveInUse"><input type="checkbox" ng-required=" SelectesReasonReport == 'monthly report' ? true : false " />I declare that I have seen this Encryptor with my own eyes</div>
                         <div class="container">
                             <div class="form-group" ng-if="!reportForm.$valid">
                                 <label class="text-danger" style="font-size:130%"> All fileds are requierd and necessary for send the report! </label>
@@ -399,8 +492,10 @@
             <div class="modal-content">
                 <form>
                     <div class="modal-header">
-                        <h4 class="modal-title">Report information</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <div class="flex-container">
+                            <h4 class="modal-title">Report data</h4>
+                            <button type="button" class="close" data-dismiss="modal" style="margin-left:75%" aria-hidden="true" ng-click="cleanReport()">&times;</button>
+                        </div>
                     </div>
 
                     <div class="modal-body">
@@ -431,7 +526,7 @@
 
                         <div class="form-group" ng-if="tempDataForEditWindow.reportType == 'changing encryptor status'">
                             <label>Encryptor previous status</label>
-                            <input type="text" class="form-control" readonly ng-model="" />
+                            <input type="text" class="form-control" readonly ng-model="currentEncData.status" />
                         </div>
 
                         <div class="form-group" ng-if="tempDataForEditWindow.reportType == 'changing encryptor status'">

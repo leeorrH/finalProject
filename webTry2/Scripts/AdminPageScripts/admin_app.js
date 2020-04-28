@@ -621,6 +621,7 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
         switch ($scope.tempDataForEditWindow.reportType) {
             case "changing encryptor status":
                 document.getElementById('down').href = $scope.userReports[index].reference;
+                $scope.currentEncData = ($scope.userEncryptors).find(enc => enc.serialNumber == $scope.tempDataForEditWindow.enc.serialNumber);
                 break;
             case "deliver to employee":
                 let newOwner = ($scope.employees).find(emp => emp.userName == $scope.tempDataForEditWindow.enc.ownerID);
