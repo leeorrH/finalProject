@@ -203,6 +203,10 @@
                                     </div>
                                 </div>
 
+                                <div ng-hide="approveInUse" class="form-group" style="margin-top: 6%;margin-right: 30%;">
+                                    <input type="checkbox" ng-required=" SelectesReasonReport == 'monthly report' ? true : false " />    I declare that I have seen this Encryptor with my own eyes
+                                </div>
+
                                 <div ng-hide="deliverToEmpDetails" class="ng-hide">
                                     <label>Enc. deliver to: </label>
                                     <select reference="toReset" ng-model="emp" ng-options="employee as employee.userName + ' - ' + employee.firstName + ' ' + employee.lastName
@@ -247,8 +251,7 @@
                                             <select reference="toReset" ng-model="room" ng-options="room as room
                                                         for room in rooms" class="selectpicker" data-live-search="true"
                                                     ng-required=" SelectesReasonReport == 'deliver to employee' ? true :
-                                                                  SelectesReasonReport ==  'changing encryptor location'? true : false">
-                                            </select>
+                                                                  SelectesReasonReport ==  'changing encryptor location'? true : false"></select>
                                         </div>
                                     </div>
                                 </div>
@@ -298,22 +301,21 @@
                             </div>
 
                         </div>
-                        <div ng-hide="approveInUse"><input type="checkbox" ng-required=" SelectesReasonReport == 'monthly report' ? true : false " />I declare that I have seen this Encryptor with my own eyes</div>
-                        <div class="container">
-                            <div class="form-group" ng-if="!reportForm.$valid">
-                                <label class="text-danger" style="font-size:130%"> All fileds are requierd and necessary for send the report! </label>
-                            </div>
+                        <div class="form-group" ng-if="!reportForm.$valid">
+                            <label class="text-danger" style="font-size:130%"> All fileds are requierd and necessary for send the report! </label>
+                        </div>
+                        <div class="form-group">
                             <div style="width:70%; height: 100px; margin:10px">
                                 <label>notifications</label>
                                 <textarea class="form-control" style="height: 80%"
                                           ng-model="notification"></textarea>
                             </div>
-                            <label>Please pay attention that the time stamp field will update automaticly when submited.</label>
                             <div>
                                 <button type="submit" data-dismiss="modal" aria-hidden="true" class="btn btn-primary pull-right" style="margin-right:10%" ng-disabled="!reportForm.$valid" ng-click=" sendReport()"> Send report </button>
                             </div>
                         </div>
-                    </div>
+                            <label>Please pay attention that the time stamp field will update automaticly when submited.</label>
+                        </div>
                 </form>
             </div>
         </div>

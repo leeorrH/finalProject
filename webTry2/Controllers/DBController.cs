@@ -22,27 +22,33 @@ namespace webTry2.Controllers
             connectionToSql = new SqlConnection(connectionString);
         }
 
-        public void connectToSQL()
+        public bool connectToSQL()
         {
+            bool res = true;
             try
             {
                 connectionToSql.Open();
             }
             catch (SqlException)
             {
-                Console.WriteLine("error while connecting to DB");
+                res = false;
+                throw new Exception("error while connecting to DB");
             }
+
+            return res;
         }
 
-        public void closeConnectionAndReading()
+        public bool closeConnectionAndReading()
         {
+            bool res = true;
             try
             {
                 connectionToSql.Close();
             }
             catch
             {
-                System.Console.WriteLine("connection to sql is closed/n");
+                res = false;
+                throw new Exception("connection to sql is closed\n");
             }
             try
             {
@@ -50,21 +56,28 @@ namespace webTry2.Controllers
             }
             catch
             {
-                System.Console.WriteLine("datareader is closed/n");
+                res = false;
+                //throw new Exception("datareader is closed\n");
             }
+
+            return res;
         }
 
         public SqlDataReader sendSqlQuery(string sqlQuery)
         {
             command = new SqlCommand(sqlQuery, connectionToSql);
-            if (!dataReader.IsClosed)
+            if(dataReader != null)
             {
-                closeConnectionAndReading();
-                connectToSQL();
+                if (!dataReader.IsClosed)
+                {
+                    closeConnectionAndReading();
+                    connectToSQL();
+                }
             }
             dataReader = command.ExecuteReader();
             return dataReader;
         }
+
         // sql query for Insert Delete or Update
         public int sqlIUDoperation (string sqlIUDquery)
         {

@@ -62,7 +62,7 @@ namespace webTry2.Controllers
 
                 loc.facility = dataReader.GetValue(5).ToString();// facility
                 loc.building = dataReader.GetValue(6).ToString();// building
-                loc.floor = UInt32.Parse(dataReader.GetValue(7).ToString());// floor
+                loc.floor = Int32.Parse(dataReader.GetValue(7).ToString());// floor
                 loc.room = UInt32.Parse(dataReader.GetValue(8).ToString());// room
                 loc.longitude = Double.Parse(dataReader.GetValue(9).ToString());// lat
                 loc.latitude = Double.Parse(dataReader.GetValue(10).ToString());// long
@@ -254,7 +254,7 @@ namespace webTry2.Controllers
                     break;
                 case "changing encryptor status":
                     sqlQuery = "UPDATE Encryptors " +
-                 "SET status = '" + report.enc.status + "'" +
+                 "SET status = " + empRepCtrl.statusStringToInt(report.enc.status) + " " +
                  "WHERE SN = '" + report.enc.serialNumber + "'; ";
                     break;
                 case "deliver to employee"://case that change only emp without location

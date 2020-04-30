@@ -583,6 +583,12 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
         }
         $scope.ownerFullName = ownerReportObj.userName + " - " + ownerReportObj.firstName + " " + ownerReportObj.lastName;
 
+        //manager in charge full name
+        $scope.managerInChargeFullName = '';
+        if ($scope.tempDataForEditWindow.managerInCharge != null) {
+            $scope.managerInChargeFullName = $scope.tempDataForEditWindow.managerInCharge.userName + " - " + $scope.tempDataForEditWindow.managerInCharge.firstName + " " + $scope.tempDataForEditWindow.managerInCharge.lastName;
+        }
+
         switch ($scope.tempDataForEditWindow.reportType) {
             case "changing encryptor status":
                 document.getElementById('down').href = $scope.userReports[index].reference;

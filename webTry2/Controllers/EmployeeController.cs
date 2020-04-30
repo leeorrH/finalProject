@@ -12,7 +12,7 @@ namespace WEB_project.Controllers
     public class EmployeeController : DBController
     {
         
-        private EmployeeReportSubController empRepCtrl = new EmployeeReportSubController();
+        public EmployeeReportSubController empRepCtrl = new EmployeeReportSubController();
         private EncryptorSubController encCntrl = new EncryptorSubController();
 
         public Dictionary<string,User> users = new Dictionary<string, User>();
@@ -261,6 +261,38 @@ namespace WEB_project.Controllers
             }
 
             return user;
+        }
+
+        //need to be remove or replace the origin method with actionResult
+        public List<User> GetAllemployees()
+        {
+            if (employees.Count != 0) return employees;
+
+            User temp;
+            bool dataReaderFlag = false;
+
+            connectToSQL();
+            sqlQuery = "select emp.userName, emp.firstName, emp.lastName " +
+                       " from Users as emp ";
+
+            SqlDataReader result = sendSqlQuery(sqlQuery);
+            while (result.Read())
+            {
+                dataReaderFlag = true;
+                temp = new User();
+                temp.userName = result.GetValue(0).ToString();
+                temp.firstName = result.GetValue(1).ToString();
+                temp.lastName = result.GetValue(2).ToString();
+                employees.Add(temp);
+            }
+            closeConnectionAndReading();
+
+            if (dataReaderFlag == false)
+            {
+                return null;
+            }
+
+            return employees;
         }
     }
 

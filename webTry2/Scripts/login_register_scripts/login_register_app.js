@@ -2,14 +2,14 @@
 app.controller("login_register_controller", function ($scope, $http) {
 
     $scope.User = {
-        "UserName": "",
-        "password": "",
-        "firstName": "",
-        "lastName": "",
-        "email": "",
-        "phoneNumber": "",
-        "permission": "",
-        "unit": ""
+        userName: "",
+        password: "",
+        firstName: null,
+        lastName: null,
+        email: null,
+        phoneNumber: "",
+        permission: "",
+        unit: ""
     };
 
 
@@ -19,17 +19,18 @@ app.controller("login_register_controller", function ($scope, $http) {
        
         $http({
             method: "POST",
-            data: $scope.User,
+            data: { userObj: $scope.User },
             //url define what function we applay to when post to the server
             url: "Home/LoginCheck"
-        }).then(function (dataReturn) {
+        }).then(function (response) {
             //
             // move on to the next page
-            if (dataReturn.data != "") {
-                var queryString = "?userName=" + dataReturn.data.userName;
-                if (dataReturn.data.permission == "employee")
+            let user = response.data;
+            if (user != "") {
+                var queryString = "?userName=" + user.userName;
+                if (user.permission == "employee")
                     window.location.href = "/Employee/employeePage" + queryString;
-                else if (dataReturn.data.permission == "manager")
+                else if (user.permission == "manager")
                     window.location.href = "/Admin/adminPage" + queryString;
             }
             else {

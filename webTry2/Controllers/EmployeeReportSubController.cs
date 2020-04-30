@@ -72,23 +72,7 @@ namespace webTry2.Controllers
  //orit
         public void changingStatus(EmpReport empReport)
         {
-            int statusNumber = -1;
-            switch (empReport.enc.status)
-            {
-                case "destroyed":
-                    statusNumber = 2;
-                    break;
-                case "lost":
-                    statusNumber = 3;
-                    break;
-                case "delivered":
-                    statusNumber = 4;
-                    break;
-                default:
-                    System.Console.WriteLine(" status was not valid and set as -in use- ! ");
-                    statusNumber = 1;
-                    break;
-            }
+            int statusNumber = statusStringToInt(empReport.enc.status);
             closeConnectionAndReading();
             connectToSQL();
             sqlQuery = "INSERT INTO dbo.EmployeeReport (reportType,reportOwner, date,encSN, ownerID,encStatus,location,notifications,reference,approvementStatus)" +
@@ -148,10 +132,13 @@ namespace webTry2.Controllers
             sqlQuery = "SELECT * FROM EmployeeReport AS ER "+
                        "WHERE MONTH(ER.date) = MONTH(GETDATE()) " +
                        "AND YEAR(ER.date) = YEAR(GETDATE());";
-            if (!dataReader.IsClosed && dataReader.HasRows) closeConnectionAndReading();
-            if (dataReader.IsClosed)
-                connectToSQL();
-
+            if(dataReader != null)
+            {
+                if (!dataReader.IsClosed && dataReader.HasRows) closeConnectionAndReading();
+                if (dataReader.IsClosed)
+                    connectToSQL();
+            }
+            
             dataReader = sendSqlQuery(sqlQuery);
 
             reports = GetEmpReportsList(dataReader,employees);
@@ -257,7 +244,7 @@ namespace webTry2.Controllers
         public void Sending_mail(User previousOwner, User newOwner, EmpReport empRep) // prevEncOwner - previous encryptor owner.
         {
             MailAddress to = new MailAddress(newOwner.email); // swap adresses for sending from the manager to employee
-            MailAddress from = new MailAddress("leeorrh2@gmail.com");
+            MailAddress from = new MailAddress("rafaelencsystem@gmail.com");
             List<Encryptor>  result = encSubCntrl.GetEncryptorBySN(empRep.enc.serialNumber, "Encryptors");
             Encryptor currentEncryptorData = result[0];
             bool differentLocation = empRep.enc.deviceLocation.locationID == currentEncryptorData.deviceLocation.locationID ? false : true; //checking if there is a difference between enc location before and affter the ownership change
@@ -293,7 +280,7 @@ namespace webTry2.Controllers
 
             SmtpClient client = new SmtpClient("smtp.gmail.com", 587)
             {
-                Credentials = new NetworkCredential("leeorrh2@gmail.com", "leeorr1992"),
+                Credentials = new NetworkCredential("rafaelencsystem@gmail.com", "rafaelsystem123"),
                 EnableSsl = true
             };
             // code in brackets above needed if authentication required 
@@ -337,6 +324,29 @@ namespace webTry2.Controllers
             closeConnectionAndReading();
             return location;
         } 
+
+        public int statusStringToInt (string status)
+        {
+            int statusNumber = -1;
+            switch (status)
+            {
+                case "destroyed":
+                    statusNumber = 2;
+                    break;
+                case "lost":
+                    statusNumber = 3;
+                    break;
+                case "delivered":
+                    statusNumber = 4;
+                    break;
+                default:
+                    System.Console.WriteLine(" status was not valid and set as -in use- ! ");
+                    statusNumber = 1;
+                    break;
+            }
+
+            return statusNumber;
+        }
     }
 }
 

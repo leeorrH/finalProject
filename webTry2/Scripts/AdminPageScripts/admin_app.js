@@ -612,11 +612,18 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
         tempDataIndex = index;
         $scope.tempDataForEditWindow = $scope.userReports[index];
 
-        var ownerReportObj = ($scope.employees).find(emp => emp.userName == $scope.tempDataForEditWindow.reportOwner);
+        //owner full name
+        let ownerReportObj = ($scope.employees).find(emp => emp.userName == $scope.tempDataForEditWindow.reportOwner);
         if (angular.isUndefined(ownerReportObj)) {
             ownerReportObj = userDetails;
         }
         $scope.ownerFullName = ownerReportObj.userName + " - " + ownerReportObj.firstName + " " + ownerReportObj.lastName;
+
+        //manager in charge full name
+        $scope.managerInChargeFullName = '';
+        if ($scope.tempDataForEditWindow.managerInCharge != null) {
+            $scope.managerInChargeFullName = $scope.tempDataForEditWindow.managerInCharge.userName + " - " + $scope.tempDataForEditWindow.managerInCharge.firstName + " " + $scope.tempDataForEditWindow.managerInCharge.lastName;
+        }
 
         switch ($scope.tempDataForEditWindow.reportType) {
             case "changing encryptor status":
@@ -660,6 +667,7 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
             else {
                 alert("successfull update approvment status");
                 $scope.tempDataForEditWindow.approvementStatus = data;
+                //TBD - set new enc data affter approving 
             }
         });
     }

@@ -19,12 +19,12 @@ namespace webTry2.Controllers
         }
 
         [HttpPost]
-        public ActionResult LoginCheck(User userObj)
+        public JsonResult LoginCheck(User userObj)
         {
             Boolean dataReaderFlag = false; 
-            //User userReturn = new User();
-            if(userObj.userName == null)
-                return Json(userReturn, JsonRequestBehavior.AllowGet);
+            User userReturn = new User();
+            if(userObj.userName == null || userObj.password == null)
+                return null;
 
             connectToSQL();
 
@@ -50,9 +50,9 @@ namespace webTry2.Controllers
             closeConnectionAndReading();
 
             //in case there is no such user in DB
-            if (dataReaderFlag == false) return Json(null, JsonRequestBehavior.AllowGet);
+            if (dataReaderFlag == false) return null;
 
-            return Json(userReturn, JsonRequestBehavior.AllowGet);
+            return Json(userReturn);
         }
 
 

@@ -11,6 +11,7 @@ namespace webTry2.Models
         public string reference { get; set; }
         public bool approvementStatus { get; set; }
         public string encNewStatus { get; set; }
+        public string managerInCharge { get; set; }
 
     }
 

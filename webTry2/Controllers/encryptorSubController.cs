@@ -47,7 +47,7 @@ namespace webTry2.Controllers
                 temp.deviceLocation.locationID = Int16.Parse(dataReader.GetValue(3).ToString());
                 temp.deviceLocation.facility = dataReader.GetValue(4).ToString();
                 temp.deviceLocation.building = dataReader.GetValue(5).ToString();
-                temp.deviceLocation.floor = UInt32.Parse(dataReader.GetValue(6).ToString());
+                temp.deviceLocation.floor = Int32.Parse(dataReader.GetValue(6).ToString());
                 temp.deviceLocation.room = UInt32.Parse(dataReader.GetValue(7).ToString());
                 temp.deviceLocation.longitude = Double.Parse(dataReader.GetValue(8).ToString());
                 temp.deviceLocation.latitude = Double.Parse(dataReader.GetValue(9).ToString());
@@ -66,8 +66,9 @@ namespace webTry2.Controllers
         {
             List<Encryptor> encList = new List<Encryptor>();
             // set ENUM for status
-            sqlQuery = "SELECT * " +
-                       "FROM " + tblName + "  WHERE "+tblName+".SN = '" + encSN + "';";   // "FROM " + tblName + " as Enc WHERE Enc.SN = '" + encSN + "';";
+            sqlQuery = "SELECT tbl.SN, tbl.timeStamp, tbl.ownerID, tbl.status, tbl.locationID, tbl.lastReported " +
+                       "FROM " + tblName + " as tbl " +
+                       "WHERE tbl.SN = '" + encSN + "';";   // "FROM " + tblName + " as Enc WHERE Enc.SN = '" + encSN + "';";
 
             dataReader = sendSqlQuery(sqlQuery);
             if (dataReader.HasRows)
@@ -76,11 +77,11 @@ namespace webTry2.Controllers
                 {
                     Encryptor enc = new Encryptor();
                     enc.serialNumber = encSN;
-                    enc.timestampAsString = dataReader.GetValue(2).ToString(); //date as string
+                    enc.timestampAsString = dataReader.GetValue(1).ToString(); //date as string
                                                                                //enc.timestamp = DateTime.ParseExact(enc.timestampAsString, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture); //DateTime Obj
-                    enc.ownerID = dataReader.GetValue(3).ToString();
-                    enc.status = StatusNumberToString(Int16.Parse(dataReader.GetValue(4).ToString()));
-                    enc.deviceLocation.locationID = Int16.Parse(dataReader.GetValue(5).ToString());
+                    enc.ownerID = dataReader.GetValue(2).ToString();
+                    enc.status = StatusNumberToString(Int16.Parse(dataReader.GetValue(3).ToString()));
+                    enc.deviceLocation.locationID = Int16.Parse(dataReader.GetValue(4).ToString());
                     encList.Add(enc);
                 }
             }
@@ -104,20 +105,24 @@ namespace webTry2.Controllers
             return encHistory;
         }
 
-        private Location GetEncLocationBylocID(string locID)
+        public Location GetEncLocationBylocID(string locID)
         {
             Location loc = new Location();
 
             sqlQuery = "SELECT * from Locations WHERE Locations.locationID = '" + locID + "';";
-            if (dataReader.IsClosed)
+            if(dataReader != null)
             {
-                connectToSQL();
+                if (dataReader.IsClosed)
+                {
+                    connectToSQL();
+                }
+                else
+                {
+                    closeConnectionAndReading();
+                    connectToSQL();
+                }
             }
-            else
-            {
-                closeConnectionAndReading();
-                connectToSQL();
-            }
+            
             dataReader = sendSqlQuery(sqlQuery);
 
             if (dataReader.HasRows)
@@ -126,7 +131,7 @@ namespace webTry2.Controllers
                 loc.locationID  =   Int16.Parse(dataReader.GetValue(0).ToString());
                 loc.facility    =   dataReader.GetValue(1).ToString();
                 loc.building    =   dataReader.GetValue(2).ToString();
-                loc.floor  =   UInt16.Parse(dataReader.GetValue(3).ToString());
+                loc.floor  =   Int16.Parse(dataReader.GetValue(3).ToString());
                 loc.room = UInt16.Parse(dataReader.GetValue(4).ToString());
                 loc.longitude = Double.Parse(dataReader.GetValue(5).ToString());
                 loc.latitude = Double.Parse(dataReader.GetValue(6).ToString());
