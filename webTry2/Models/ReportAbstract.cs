@@ -10,12 +10,12 @@ namespace webTry2.Models
         public int reportID { get; set; }
         public string reportType { get; set; }
         public String reportOwner { get; set; }
-        public DateTime date { get; set; }
+        public string date { get; set; }
         public String notifications { get; set; }
 
         public ReportAbstract()
         {
-            date = DateTime.Now;
+            //date = DateTime.Now;
         }
 
     }

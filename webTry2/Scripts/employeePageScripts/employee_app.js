@@ -400,8 +400,10 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
             var marker = new google.maps.Marker({
                 //setting marker position
                 position: new google.maps.LatLng(encryptor.deviceLocation.latitude, encryptor.deviceLocation.longitude),
+                label: '' + index , 
                 _details: encryptor
             });
+       
             k = markersList.push(marker); // k is count on elements in markers array. 
 
             var infowindow = new google.maps.InfoWindow({
@@ -411,6 +413,8 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
             markersList[k - 1].addListener('click', function () {
                 infowindow.open($scope.gMap, marker);
             });
+
+            
         });
         clusterMarkers(markersList);
     };
@@ -494,6 +498,15 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
                 });
             }
             initMarkers(tempList, historyMarkers);
+            var currentEnc = $scope.userEncryptors.find(enc => enc.serialNumber == $scope.mapEnc.serialNumber);
+            var currEncMarker = new google.maps.Marker({
+                //setting marker position
+                position: new google.maps.LatLng(currentEnc.deviceLocation.latitude, currentEnc.deviceLocation.longitude),
+                label: '' + historyMarkers.length,
+                icon: '/Content/images/icons8-marker-64.png',
+                _details: currentEnc
+            });
+            historyMarkers.push(currEncMarker);
             setMapOnAll(null, markersArray);
             setMapOnAll($scope.gMap, historyMarkers);
             clusterMarkers(historyMarkers);
@@ -564,9 +577,9 @@ app.controller("employeePageContoller", ['$scope', '$location', '$http', '$timeo
             if (reports) {
                 $.each(reports, function (index, report) {
                     //parse datetime to date
-                    var parsedDate = new Date(parseInt(report.date.substr(6)));
-                    var newDate = new Date(parsedDate);
-                    report.date = newDate.getDay() + " - " + newDate.getMonth() + " - " + newDate.getFullYear();
+                    //var parsedDate = new Date(parseInt(report.date.substr(6)));
+                    //var newDate = new Date(parsedDate);
+                    //report.date = newDate.getDate() + " - " + ( newDate.getMonth() + 1 ) + " - " + newDate.getFullYear();
                     $scope.userReports.push(report);
                 });
             }

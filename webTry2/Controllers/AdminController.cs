@@ -54,8 +54,7 @@ namespace webTry2.Controllers
                 temp.serialNumber = dataReader.GetValue(0).ToString(); //Encryptor SN
                 temp.ownerID = dataReader.GetValue(1).ToString(); // owner ID - employee user name
                 //setting date 
-                temp.timestampAsString = dataReader.GetValue(2).ToString(); //date as string
-                temp.timestamp = DateTime.ParseExact(temp.timestampAsString, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture); // date as an object
+                temp.timestampAsString = DateTime.ParseExact(dataReader.GetValue(2).ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture).ToString(); //date as string 
                 temp.status = dataReader.GetValue(3).ToString(); // 
                 temp.lastReported = dataReader.GetValue(11).ToString();//last seen Date
                 //adding data to location
@@ -127,7 +126,7 @@ namespace webTry2.Controllers
                 xlWorkSheet.Cells[i + 2, 10] = owner.lastName + " " + owner.firstName;
             }
 
-            xlWorkBook.SaveAs("C:\\Users\\leeorr\\Downloads\\csharp-Excel.xls", Excel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue, Excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
+            xlWorkBook.SaveAs("C:\\Users\\leeorr\\Downloads\\Encryptor_Report_" + DateTime.Now.ToString("dd/MM/yyyy", new CultureInfo("de-DE")) + ".xls", Excel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue, Excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
             xlWorkBook.Close(true, misValue, misValue);
             xlApp.Quit();
 
@@ -222,14 +221,13 @@ namespace webTry2.Controllers
         }
 
 
-
-    public bool insertEncryptorDataToHistory(Encryptor enc)
+       public bool insertEncryptorDataToHistory(Encryptor enc)
         {
             if (!dataReader.IsClosed && dataReader.HasRows) closeConnectionAndReading();
             //insert the old encryptor data to history
             connectToSQL();
-            string dateTime = (DateTime.Parse(enc.lastReported)).ToString("yyyy-MM-dd HH:mm:ss");
-            string encTimeStamp = (DateTime.Parse(enc.timestampAsString)).ToString("yyyy-MM-dd HH:mm:ss");
+            string dateTime = (DateTime.Parse(enc.lastReported)).ToString("dd-MM-yyyy HH:mm:ss");
+            string encTimeStamp = (DateTime.Parse(enc.timestampAsString)).ToString("dd-MM-yyyy HH:mm:ss");
             sqlQuery = "INSERT INTO dbo.EncryptorHistory(SN ,timeStamp, ownerID,status,locationID,lastReported)" +
                         "VALUES('" + enc.serialNumber + "', '" + encTimeStamp + "', '" + enc.ownerID + "'," + enc.status + ", " + enc.deviceLocation.locationID + ", '" + dateTime + "'); ";
 
@@ -258,8 +256,9 @@ namespace webTry2.Controllers
                  "WHERE SN = '" + report.enc.serialNumber + "'; ";
                     break;
                 case "deliver to employee"://case that change only emp without location
+                    string nowDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                     sqlQuery = "UPDATE Encryptors " +
-                  "SET ownerID = '" + report.enc.ownerID + "', locationID = '" + report.enc.deviceLocation.locationID + "'" +
+                  "SET ownerID = '" + report.enc.ownerID + "', locationID = '" + report.enc.deviceLocation.locationID + "', timeStamp = '" + nowDate + "', lastReported = '" + nowDate + "' " +
                   "WHERE SN = '" + report.enc.serialNumber + "'; ";
                     break;
             }

@@ -36,8 +36,7 @@ namespace webTry2.Controllers
                 temp.serialNumber = dataReader.GetValue(0).ToString();
 
                 //setting date 
-                temp.timestampAsString = dataReader.GetValue(1).ToString(); //date as string
-                temp.timestamp = DateTime.ParseExact(temp.timestampAsString, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture); // date as an object
+                temp.timestampAsString = DateTime.ParseExact(dataReader.GetValue(1).ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture).ToString(); //date as string
 
 
                 temp.status = dataReader.GetValue(2).ToString();

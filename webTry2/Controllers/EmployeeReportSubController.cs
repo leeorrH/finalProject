@@ -5,6 +5,7 @@ using webTry2.Models;
 using webTry2.Models.requests;
 using System.Net;
 using System.Net.Mail;
+using System.Globalization;
 
 namespace webTry2.Controllers
 {
@@ -21,7 +22,7 @@ namespace webTry2.Controllers
         {
 
             sqlQuery = "INSERT INTO dbo.EmployeeReport (reportType,reportOwner, date,encSN, ownerID,encStatus,location,notifications,reference,approvementStatus)" +
-                          " VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateToString(empReport) + "', '" + empReport.enc.serialNumber + "', NULL, NULL, NULL,'" + empReport.notifications + "', NULL, 'waiting for approvment'); ";
+                          " VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "', '" + empReport.enc.serialNumber + "', NULL, NULL, NULL,'" + empReport.notifications + "', NULL, 'waiting for approvment'); ";
             var res=sqlIUDoperation(sqlQuery); 
             if (res == 0)
             {
@@ -41,7 +42,7 @@ namespace webTry2.Controllers
             {
                 sqlQuery = "INSERT INTO dbo.EmployeeReport (reportType,reportOwner, date,encSN, ownerID,encStatus,location,notifications,reference,approvementStatus) " +
                         "OUTPUT inserted.reportID " +
-                        "VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateToString(empReport) + "', '" + empReport.enc.serialNumber + "', NULL, NULL,'" +empReport.enc.deviceLocation.locationID+ "' ,'" + empReport.notifications + "', NULL, 'waiting for approvment'); ";
+                        "VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "', '" + empReport.enc.serialNumber + "', NULL, NULL,'" +empReport.enc.deviceLocation.locationID+ "' ,'" + empReport.notifications + "', NULL, 'waiting for approvment'); ";
 
                 var res = sqlIUDoperation(sqlQuery); // TODO if false then ... 
                 if (res == 0)
@@ -60,7 +61,7 @@ namespace webTry2.Controllers
              connectToSQL();
              sqlQuery = "INSERT INTO dbo.EmployeeReport (reportType,reportOwner, date,encSN, ownerID,encStatus,location,notifications,reference,approvementStatus) " +
                         "OUTPUT inserted.reportID " +
-                        "VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateToString(empReport) + "', '" + empReport.enc.serialNumber + "', '" + empReport.enc.ownerID + "', NULL,'" + empReport.enc.deviceLocation.locationID + "' ,'" + empReport.notifications + "', NULL, 'waiting for approvment'); ";
+                        "VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "', '" + empReport.enc.serialNumber + "', '" + empReport.enc.ownerID + "', NULL,'" + empReport.enc.deviceLocation.locationID + "' ,'" + empReport.notifications + "', NULL, 'waiting for approvment'); ";
             var res = sqlIUDoperation(sqlQuery); // TODO if false then ... 
             if (res == 0)
             {
@@ -76,7 +77,7 @@ namespace webTry2.Controllers
             closeConnectionAndReading();
             connectToSQL();
             sqlQuery = "INSERT INTO dbo.EmployeeReport (reportType,reportOwner, date,encSN, ownerID,encStatus,location,notifications,reference,approvementStatus)" +
-                     " VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateToString(empReport) + "', '" + empReport.enc.serialNumber + "', NULL, " + statusNumber + ", NULL,'" + empReport.notifications + "','"+empReport.reference+ "', 'waiting for approvment'); ";
+                     " VALUES('" + empReport.reportType + "', '" + empReport.reportOwner + "', '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "', '" + empReport.enc.serialNumber + "', NULL, " + statusNumber + ", NULL,'" + empReport.notifications + "','"+empReport.reference+ "', 'waiting for approvment'); ";
             var res = sqlIUDoperation(sqlQuery);
             if (res == 0)
             {
@@ -151,25 +152,25 @@ namespace webTry2.Controllers
                 return null;
             }
         }
-       
 
-        public string DateToString(EmpReport rep)
+        public Location SetLocationID(Location deviceLocation)
         {
-            return rep.date.ToString("yyyy-MM-dd HH:mm:ss.fff");
-        }
-
-        private Location SetLocationID(Location deviceLocation)
-        {
+            closeConnectionAndReading();
+            connectToSQL();
             sqlQuery = "SELECT locationID " +
                         "FROM Locations L " +
                         "WHERE L.facility = '" + deviceLocation.facility
                         + "'  AND L.building = '" + deviceLocation.building
                         + "'  AND L.floor = " + deviceLocation.floor
                         + "   AND L.room = " + deviceLocation.room + ";" ;
-            if (dataReader.IsClosed)
-            {
-                connectToSQL();
-            }
+            //if(dataReader != null)
+            //{
+            //    if (dataReader.IsClosed)
+            //    {
+            //        connectToSQL();
+            //    }
+            //}
+            
             dataReader = sendSqlQuery(sqlQuery);
 
             if (dataReader.Read())
@@ -193,7 +194,7 @@ namespace webTry2.Controllers
                 temp.reportID = Int32.Parse(dataReader.GetValue(0).ToString()); // V
                 temp.reportType = dataReader.GetValue(1).ToString(); // V
                 temp.reportOwner = dataReader.GetValue(2).ToString();  // V
-                temp.date = DateTime.Parse(dataReader.GetValue(3).ToString()); //V
+                temp.date = dataReader.GetValue(3).ToString(); // DateTime.ParseExact(dataReader.GetValue(3).ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture).ToString()
                 temp.enc.serialNumber = dataReader.GetValue(4).ToString(); // V
 
                 switch (temp.reportType)

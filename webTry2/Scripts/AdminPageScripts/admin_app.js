@@ -598,10 +598,10 @@ app.controller("adminPageContoller", ['$scope', '$location', '$http', '$timeout'
             $scope.userReports = [];
             if (reports) {
                 $.each(reports, function (index, report) {
-                    //parse datetime to date
-                    var parsedDate = new Date(parseInt(report.date.substr(6)));
-                    var newDate = new Date(parsedDate);
-                    report.date = newDate.getDay() + " - " + newDate.getMonth() + " - " + newDate.getFullYear();
+                    ////parse datetime to date
+                    //var parsedDate = new Date(parseInt(report.date.substr(6)));
+                    //var newDate = new Date(parsedDate);
+                    //report.date = newDate.getDay() + " - " + newDate.getMonth() + " - " + newDate.getFullYear();
                     $scope.userReports.push(report);
                 });
             }
